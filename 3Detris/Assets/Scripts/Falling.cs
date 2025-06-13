@@ -1,28 +1,92 @@
+using System.Collections;
 using UnityEngine;
 
 public class Falling : MonoBehaviour
 {
     private bool falling = true;
     private bool aboveSolid;
-
-    public float fallingSpeed = 2.0f;
-    private float fallingTimerTime = 10.0f;
-    private float fallingTimercounter;
-    public GameObject[] cubes;
-
-    LayerMask layerMask;
     private float rayDistance = 1.1f;
+    public float fallingSpeed = 1f;
+    private float fallingTimerTime = 5.0f;
+    private float fallingTimercounter;
+    private int fallenBlocks; 
 
-    public int fallenBlocks;
+    public GameObject[] cubes;
+    LayerMask layerMask;
+
+    [SerializeField] private ShapeDispenser shapeDispenser;
+    [SerializeField] private LinePoints linePoints;
+
+    private Vector3[] indicatorPos;
+    [SerializeField] private GameObject ghostCube;
+    private GameObject[] ghostCubes;
+
+    public bool _Debug_IsLine;
 
     private void Awake()
     {
         layerMask = LayerMask.GetMask("Solid");
+        if (_Debug_IsLine)
+        {
+            MakeSolid();
+        }
+    }
+    private void Start()
+    {
+        shapeDispenser = FindFirstObjectByType<ShapeDispenser>();
+        linePoints = FindFirstObjectByType<LinePoints>();
+        if (!_Debug_IsLine)
+            GhostIndicatorArrays();
+        fallingSpeed = linePoints.GetFallingSpeed();
     }
     private void FixedUpdate()
     {
+        if (falling)
+        {
+            GroundCheck();
+
+        }
+    }
+    void Update()
+    {
+        if (falling)
+        {
+            Fall();
+            GhostIndicator();
+        }
+        else
+            DestroyIfEmpty();
+    }
+    private void Fall()
+    {
+        fallingTimercounter += Time.deltaTime;
+
+        if (fallingTimercounter >= fallingTimerTime / fallingSpeed)
+        {
+            if (aboveSolid)
+            {
+                MakeSolid();
+            }
+            else
+            {
+                fallingTimercounter = 0;
+                transform.position += Vector3.down;
+                fallenBlocks++;
+            }
+        }
+    }
+    public void DropShape()
+    {
+        float Distance = RayDistance() - 0.5f; // 0.5 to center of cube
+        transform.position -= new Vector3(0, Distance, 0);
+        fallenBlocks += (int)Distance*2; //droped blocks x2 points
+        MakeSolid();
+    }
+    private void GroundCheck()
+    {
         foreach (GameObject obj in cubes)
         {
+            aboveSolid = false;
             RaycastHit hit;
             if (Physics.Raycast(obj.transform.position, Vector3.down, out hit, rayDistance, layerMask))
             {
@@ -34,36 +98,94 @@ public class Falling : MonoBehaviour
             else
             {
                 Debug.DrawRay(obj.transform.position, Vector3.down * rayDistance, Color.white);
-                aboveSolid = false;
                 //Debug.Log("Did not Hit");
             }
-
         }
     }
-
-    void Update()
+    private void MakeSolid()
     {
-        if(falling)
+        falling = false;
+        SnapToGrid(0.5f, transform);
+        gameObject.layer = 6;
+        foreach (GameObject cube in cubes)
         {
-            fallingTimercounter += Time.deltaTime;
+                cube.layer = 6;
+            linePoints.AddToGrid(cube.transform);
+        }
+        fallingTimercounter = 0;
+        DestroyGhostCubes();
+        linePoints.GetFallingSpeed();
 
-            if (fallingTimercounter >= fallingTimerTime / fallingSpeed)
+        if(!_Debug_IsLine)
+        {
+            linePoints.PointsCheck(fallingSpeed);
+            linePoints.AddDropPoints(fallenBlocks);
+            shapeDispenser.SpawnShape();
+        }
+    }
+    private float RayDistance()
+    {
+        float rayDistance = 100f;
+        foreach (GameObject obj in cubes)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(obj.transform.position, Vector3.down, out hit, 50, layerMask))
             {
-                if (aboveSolid)
+                Debug.DrawRay(obj.transform.position, Vector3.down * hit.distance, Color.blue);
+                float distance = hit.distance - .05f; //cubes are slightly smaller than 1f
+                if (rayDistance >= distance)
                 {
-                    gameObject.layer = 6;
-                    foreach (GameObject cube in cubes)
-                        cube.layer = 6;
-
-                    falling = false;
-                    fallingTimercounter = 0;
+                    rayDistance = distance;
                 }
-                else
-                {
-                    fallingTimercounter = 0;
-                    transform.position += Vector3.down;
-                    fallenBlocks++;
-                }
+            }
+        }
+        return rayDistance;
+    }
+    private void SnapToGrid(float gridUnit, Transform obj)
+    {
+        Vector3 newPos = obj.position;
+        newPos.x = Mathf.Round(newPos.x / gridUnit) * gridUnit;
+        newPos.y = Mathf.Round(newPos.y / gridUnit) * gridUnit;
+        newPos.z = Mathf.Round(newPos.z / gridUnit) * gridUnit;
+        obj.position = newPos;
+    }
+    private void GhostIndicator()
+    {
+        for (int i = 0; i < cubes.Length; i++)
+        {
+            Vector3 newIndicatorPos = cubes[i].transform.position - new Vector3(0, RayDistance() - 0.5f, 0);
+            float diferenceDistance = Vector3.Distance(indicatorPos[i], newIndicatorPos);
+            if(diferenceDistance > 0.1f)
+            {
+                indicatorPos[i] = newIndicatorPos;
+                ghostCubes[i].transform.position = indicatorPos[i];
+                SnapToGrid(0.5f, ghostCubes[i].transform);
+                //Debug.Log("ghost");
+            }
+        }
+    }
+    private void GhostIndicatorArrays()
+    {
+        indicatorPos = new Vector3[cubes.Length];
+        ghostCubes = new GameObject[cubes.Length];
+        for (int i = 0; i < cubes.Length; i++)
+        {
+            indicatorPos[i] = new Vector3(1000f, 1000f, 1000f);
+            ghostCubes[i] = Instantiate(ghostCube, indicatorPos[i], Quaternion.identity);
+        }
+    }
+    public void DestroyIfEmpty()
+    {
+        if (transform.childCount <= 1)
+            Destroy(gameObject);
+    }
+    private void DestroyGhostCubes()
+    {
+        if (!_Debug_IsLine)
+        {
+            foreach (var obj in ghostCubes)
+            {
+                Destroy(obj);
             }
         }
     }
