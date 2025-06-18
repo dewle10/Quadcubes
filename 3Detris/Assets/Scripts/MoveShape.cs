@@ -25,6 +25,7 @@ public class MoveShape : MonoBehaviour
     private float rotateZTurn;
     private bool canMove = true;
     private bool canRotate = true;
+    private bool wallKick = false;
     [SerializeField] private GameObject currentShape;
 
     //Detection
@@ -64,8 +65,9 @@ public class MoveShape : MonoBehaviour
     {
         if (moveNow)
         {
+            //Debug.Log("move");
             canMove = true;
-            GhostCheck();
+            GhostCheckMove();
             if (canMove)
             {
                 currentShape.transform.position += directionVector;
@@ -77,7 +79,7 @@ public class MoveShape : MonoBehaviour
     {
         if (rotateXNow || rotateYNow || rotateZNow)
         {
-            //obrot ducha
+            //Ghost rotation
             if (rotateZNow)
             {
                 if (rotateZTurn >= 0)
@@ -105,18 +107,42 @@ public class MoveShape : MonoBehaviour
 
             //check
             canRotate = true;
+            wallKick = false;
+            Vector3 wallKickDirection = Vector3.zero;
             for (int i = 0; i < currentGhost.childCount; i++)
             {
-                if (ghostDetections[i].GetghostHit(Vector3.zero))
+                bool hit = ghostDetections[i].GetghostHitRotate();
+                if (ghostDetections[i].GetWallHit())
+                {
+                    wallKick = true;
+                    wallKickDirection += ghostDetections[i].GetKickDirection();
+                    //Debug.Log("Wall Hit");
+                }
+                else if (hit)
                 {
                     FailedRotationIndicator();
-
                     canRotate = false;
+                    wallKick = false;
+                    break;
                 }
             }
+            if (wallKick) 
+            {
+                //Debug.Log(wallKickDirection);
+                directionVector = wallKickDirection;
+                moveNow = true;
+                Move();
+            }
+            if(!canMove && wallKick)
+            {
+                FailedRotationIndicator();
+                canRotate = false;
+                wallKick = false;
+            }
+
             currentGhost.transform.rotation = currentShape.transform.rotation;
 
-            //obrot
+            //rotation
             if (canRotate)
             {
                 if (rotateZNow)
@@ -191,11 +217,22 @@ public class MoveShape : MonoBehaviour
             ghostDetections[i] = ghostcubes[i].GetComponent<GhostDetection>();
         }
     }
-    private void GhostCheck()
+    private void GhostCheckMove()
     {
         for (int i = 0; i < currentGhost.childCount; i++)
         {
-            if (ghostDetections[i].GetghostHit(directionVector))
+            if (ghostDetections[i].GetghostHitMove(directionVector))
+            {
+                canMove = false;
+                break;
+            }
+        }
+    }
+    private void GhostCheckRotate()
+    {
+        for (int i = 0; i < currentGhost.childCount; i++)
+        {
+            if (ghostDetections[i].GetghostHitMove(directionVector))
             {
                 canMove = false;
                 break;

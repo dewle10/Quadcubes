@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 12931641}
   m_Layer: 6
   m_Name: -z
-  m_TagString: Untagged
+  m_TagString: OutOfBounds
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -180,11 +180,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 12931638}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df8040d442719974aa7e45847a822dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  kickDirection: {x: 0, y: 0, z: -1}
 --- !u!1 &39239492
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,7 +199,7 @@ GameObject:
   - component: {fileID: 39239495}
   m_Layer: 6
   m_Name: +x
-  m_TagString: Untagged
+  m_TagString: OutOfBounds
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -246,11 +247,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 39239492}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df8040d442719974aa7e45847a822dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  kickDirection: {x: 1, y: 0, z: 0}
 --- !u!1 &155512814
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,7 +266,7 @@ GameObject:
   - component: {fileID: 155512817}
   m_Layer: 6
   m_Name: +z
-  m_TagString: Untagged
+  m_TagString: OutOfBounds
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -312,11 +314,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 155512814}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df8040d442719974aa7e45847a822dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  kickDirection: {x: 0, y: 0, z: 1}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -850,7 +853,7 @@ GameObject:
   - component: {fileID: 723064296}
   m_Layer: 6
   m_Name: -x
-  m_TagString: Untagged
+  m_TagString: OutOfBounds
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -898,11 +901,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 723064293}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df8040d442719974aa7e45847a822dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  kickDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &726453806
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,6 +1073,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df8040d442719974aa7e45847a822dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  kickDirection: {x: 0, y: 1, z: 0}
 --- !u!65 &817386612
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1722,10 +1727,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1789517777}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
