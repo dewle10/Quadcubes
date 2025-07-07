@@ -45,7 +45,10 @@ public class GhostDetection : MonoBehaviour
             {
                 wallHit = true;
                 WallKicks wallKick = hits[0].gameObject.GetComponent<WallKicks>();
-                kickDirection = wallKick.GetKickDirectionWall();
+                if (wallKick.Gethitted())
+                    kickDirection = Vector3.zero;
+                else
+                    kickDirection = wallKick.GetKickDirectionWall();
                 //Debug.Log(hits[0].gameObject);
             }
         }

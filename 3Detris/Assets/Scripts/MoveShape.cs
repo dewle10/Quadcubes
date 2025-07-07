@@ -1,5 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 public class MoveShape : MonoBehaviour
 {
@@ -16,40 +17,51 @@ public class MoveShape : MonoBehaviour
     private bool rotateXNow;
     private bool rotateYNow;
     private bool rotateZNow;
-    private bool dropNow;
+    
+    [SerializeField] private float dasTime = 0.2f;    //Delayed Auto Shift DAS
+    private float dasCounter;
+    [SerializeField] private float arrTime = 0.05f; //repeatRate ARR
+    private float arrCounter;
 
     //CONTROL
     private Vector3 directionVector;
+    private Vector3 inputVector;
     private float rotateXTurn;
     private float rotateYTurn;
     private float rotateZTurn;
     private bool canMove = true;
     private bool canRotate = true;
     private bool wallKick = false;
-    [SerializeField] private GameObject currentShape;
+    private GameObject currentShape;
+    private CameraTracker cameraTracker;
+    private LinePoints linePoints;
+    [SerializeField]private int sector;
 
     //Detection
     private Transform currentGhost;
     [SerializeField] private GameObject[] ghostcubes;
     private GhostDetection[] ghostDetections;
-    [SerializeField] private LayerMask obstacleLayer;
-    [SerializeField] private Vector3 checkSize = new Vector3(0.9f,0.9f,0.9f);
-    private Collider[] hits = new Collider[1];
     [SerializeField] private GameObject indicatorCube;
+    private WallKicks[] walls;
+
+    //Sound
+    [SerializeField] private AudioSource audioMove;
+    [SerializeField] private AudioSource audioRotate;
+    [SerializeField] private AudioSource audioDrop;
 
     private void Awake()
     {
-        moveAction = InputSystem.actions.FindAction("move");
+        moveAction = InputSystem.actions.FindAction("Move");
         rotateActionX = InputSystem.actions.FindAction("RotateX");
         rotateActionY = InputSystem.actions.FindAction("RotateY");
         rotateActionZ = InputSystem.actions.FindAction("RotateZ");
         DropAction = InputSystem.actions.FindAction("Drop");
-        obstacleLayer = LayerMask.GetMask("Solid");
-        
+        walls = FindObjectsByType<WallKicks>(FindObjectsSortMode.None);
+        cameraTracker = FindFirstObjectByType<CameraTracker>();
+        linePoints = FindFirstObjectByType<LinePoints>();
     }
     void Update()
     {
-        directionVector = moveAction.ReadValue<Vector3>();
         rotateXTurn = rotateActionX.ReadValue<float>();
         rotateYTurn = rotateActionY.ReadValue<float>();
         rotateZTurn = rotateActionZ.ReadValue<float>();
@@ -65,144 +77,191 @@ public class MoveShape : MonoBehaviour
     {
         if (moveNow)
         {
-            //Debug.Log("move");
-            canMove = true;
-            GhostCheckMove();
-            if (canMove)
+            if (dasCounter < dasTime)
+                dasCounter += Time.deltaTime;
+            else
             {
-                currentShape.transform.position += directionVector;
+                arrCounter += Time.deltaTime;
+
+                if (arrCounter > arrTime)
+                {
+                    TryMove();
+                    arrCounter = 0f;
+                }
             }
-            moveNow = false;
         }
     }
     private void Rotate()
     {
-        if (rotateXNow || rotateYNow || rotateZNow)
-        {
-            //Ghost rotation
-            if (rotateZNow)
-            {
-                if (rotateZTurn >= 0)
-                    currentGhost.transform.rotation = Quaternion.Euler(0, 0, 90) * currentGhost.transform.rotation;
-                else if (rotateZTurn <= 0)
-                    currentGhost.transform.rotation = Quaternion.Euler(0, 0, -90) * currentGhost.transform.rotation;
-                Physics.SyncTransforms();
-            }
-            if (rotateYNow)
-            {
-                if (rotateYTurn >= 0)
-                    currentGhost.transform.rotation = Quaternion.Euler(0, 90, 0) * currentGhost.transform.rotation;
-                else if (rotateYTurn <= 0)
-                    currentGhost.transform.rotation = Quaternion.Euler(0, -90, 0) * currentGhost.transform.rotation;
-                Physics.SyncTransforms();
-            }
-            if (rotateXNow)
-            {
-                if (rotateXTurn >= 0)
-                    currentGhost.transform.rotation = Quaternion.Euler(90, 0, 0) * currentGhost.transform.rotation;
-                else if (rotateXTurn <= 0)
-                    currentGhost.transform.rotation = Quaternion.Euler(-90, 0, 0) * currentGhost.transform.rotation;
-                Physics.SyncTransforms();
-            }
+        if (!(rotateXNow || rotateYNow || rotateZNow)) return;
 
-            //check
-            canRotate = true;
-            wallKick = false;
-            Vector3 wallKickDirection = Vector3.zero;
-            for (int i = 0; i < currentGhost.childCount; i++)
+        int sector = cameraTracker.GetCameraSector();
+        Vector3 inputRot = Vector3.zero;
+
+        if (rotateXNow)
+            inputRot = new Vector3(rotateXTurn, 0, 0);
+        else if (rotateYNow)
+            inputRot = new Vector3(0, rotateYTurn, 0);
+        else if (rotateZNow)
+            inputRot = new Vector3(0, 0, rotateZTurn);
+
+        Vector3 Rotation = RemapBySector(inputRot, sector);
+
+        // ghost
+        currentGhost.transform.rotation = Quaternion.Euler(Rotation * 90f) * currentGhost.transform.rotation;
+        Physics.SyncTransforms();
+
+        //check
+        canRotate = true;
+        Vector3 wallKickDirection = Vector3.zero;
+        for (int i = 0; i < currentGhost.childCount; i++)
+        {
+            bool hit = ghostDetections[i].GetghostHitRotate();
+            if (ghostDetections[i].GetWallHit())
             {
-                bool hit = ghostDetections[i].GetghostHitRotate();
-                if (ghostDetections[i].GetWallHit())
-                {
-                    wallKick = true;
-                    wallKickDirection += ghostDetections[i].GetKickDirection();
-                    //Debug.Log("Wall Hit");
-                }
-                else if (hit)
-                {
-                    FailedRotationIndicator();
-                    canRotate = false;
-                    wallKick = false;
-                    break;
-                }
+                wallKick = true;
+                wallKickDirection += ghostDetections[i].GetKickDirection();
+                //Debug.Log("Wall Hit");
             }
-            if (wallKick) 
-            {
-                //Debug.Log(wallKickDirection);
-                directionVector = wallKickDirection;
-                moveNow = true;
-                Move();
-            }
-            if(!canMove && wallKick)
+            else if (hit)
             {
                 FailedRotationIndicator();
                 canRotate = false;
                 wallKick = false;
+                break;
             }
-
-            currentGhost.transform.rotation = currentShape.transform.rotation;
-
-            //rotation
-            if (canRotate)
-            {
-                if (rotateZNow)
-                {
-                    if (rotateZTurn >= 0)
-                        currentShape.transform.rotation = Quaternion.Euler(0, 0, 90) * currentShape.transform.rotation;
-                    else if (rotateZTurn <= 0)
-                        currentShape.transform.rotation = Quaternion.Euler(0, 0, -90) * currentShape.transform.rotation;
-                }
-                if (rotateYNow)
-                {
-                    if (rotateYTurn >= 0)
-                        currentShape.transform.rotation = Quaternion.Euler(0, 90, 0) * currentShape.transform.rotation;
-                    else if (rotateYTurn <= 0)
-                        currentShape.transform.rotation = Quaternion.Euler(0, -90, 0) * currentShape.transform.rotation;
-                }
-                if (rotateXNow)
-                {
-                    if (rotateXTurn >= 0)
-                        currentShape.transform.rotation = Quaternion.Euler(90, 0, 0) * currentShape.transform.rotation;
-                    else if (rotateXTurn <= 0)
-                        currentShape.transform.rotation = Quaternion.Euler(-90, 0, 0) * currentShape.transform.rotation;
-                }
-            }
-            rotateXNow = false;
-            rotateYNow = false;
-            rotateZNow = false;
         }
+        if (wallKick) 
+        {
+            //Debug.Log(wallKickDirection);
+            directionVector = wallKickDirection;
+            TryMove();
+            wallKick = false;
+        }
+        if(!canMove && wallKick)
+        {
+            FailedRotationIndicator();
+            canRotate = false;
+            wallKick = false;
+        }
+
+        ResetWalls();
+        currentGhost.transform.rotation = currentShape.transform.rotation;
+
+        //rotation
+        if (canRotate)
+        {
+            currentShape.transform.rotation = Quaternion.Euler(Rotation * 90f) * currentShape.transform.rotation;
+            audioRotate.Play();
+        }
+
+        rotateXNow = rotateYNow = rotateZNow = false;
     }
     private void CheckInput()
     {
         if (moveAction.WasPressedThisFrame())
         {
             moveNow = true;
+            TryMove();
         }
+        if (moveAction.WasReleasedThisFrame())
+        {
+            dasCounter = 0f;
+            arrCounter = 0f;
+            moveNow = false;
+        }
+
         if (rotateActionX.WasPressedThisFrame())
-        {
             rotateXNow = true;
-        }
         if (rotateActionY.WasPressedThisFrame())
-        {
             rotateYNow = true;
-        }
         if (rotateActionZ.WasPressedThisFrame())
-        {
             rotateZNow = true;
-        }
+
         if (DropAction.WasPressedThisFrame())
         {
             Falling falling = currentShape.GetComponent<Falling>();
             falling.DropShape();
+            audioDrop.Play();
         }
     }
-    private void FailedRotationIndicator()
+    private void TryMove()
     {
+        canMove = true;
+        bool canMoveX = false;
+        bool canMoveZ = false;
+
+        if (!wallKick)
+        {
+            sector = cameraTracker.GetCameraSector();
+            inputVector = moveAction.ReadValue<Vector3>();
+            directionVector = RemapBySector(inputVector,sector);
+        }
         for (int i = 0; i < currentGhost.childCount; i++)
         {
-            GameObject failedRotationIndicator = Instantiate(indicatorCube, ghostcubes[i].transform.position, ghostcubes[i].transform.rotation);
-            AutoDestroy IndicatorTime = failedRotationIndicator.GetComponent<AutoDestroy>();
-            IndicatorTime.autoDestroytimerTime = 0.2f;
+            if (ghostDetections[i].GetghostHitMove(directionVector))
+            {
+                canMove = false;
+                if (directionVector.x != 0 && directionVector.z != 0)
+                {
+                    if (!ghostDetections[i].GetghostHitMove(new Vector3(directionVector.x, 0, 0)))
+                    {
+                        canMoveX = true;
+                        Debug.Log($"canMoveX{i}");
+                        continue;
+                    }
+                    if (!ghostDetections[i].GetghostHitMove(new Vector3(0, 0, directionVector.z)))
+                    {
+                        canMoveZ = true;
+                        Debug.Log($"canMoveZ{i}");
+                        continue;
+                    }
+                }
+                canMoveX = false;
+                canMoveZ = false;
+                Debug.Log("brake");
+                break;
+            }
+        }
+        if (canMoveX ^ canMoveZ)
+        {
+            if (canMoveX)
+            {
+                currentShape.transform.position += new Vector3(directionVector.x,0,0);
+                audioMove.Play();
+            }
+            else if (canMoveZ)
+            {
+                currentShape.transform.position += new Vector3(0, 0, directionVector.z);
+                audioMove.Play();
+            }
+        }
+        else if (canMove)
+        {
+            currentShape.transform.position += directionVector;
+            audioMove.Play();
+
+            if (directionVector.y < 0) // if down
+            {
+                linePoints.AddDropPoints(1);
+                //currentShape.GetComponent<Falling>().ResetFallingTimer();
+            }
+        }
+    }
+    private Vector3 RemapBySector(Vector3 inputVec, int sector)
+    {
+        switch (sector)
+        {
+            case 0: //front
+                return new Vector3(-inputVec.x, inputVec.y, -inputVec.z);
+            case 1: //right
+                return new Vector3(-inputVec.z, inputVec.y, inputVec.x);
+            case 2: //back
+                return inputVec;
+            case 3: //left
+                return new Vector3(inputVec.z, inputVec.y, -inputVec.x);
+            default:
+                return Vector3.zero;
         }
     }
     private void GetGhost()
@@ -217,15 +276,13 @@ public class MoveShape : MonoBehaviour
             ghostDetections[i] = ghostcubes[i].GetComponent<GhostDetection>();
         }
     }
-    private void GhostCheckMove()
+    private void FailedRotationIndicator()
     {
         for (int i = 0; i < currentGhost.childCount; i++)
         {
-            if (ghostDetections[i].GetghostHitMove(directionVector))
-            {
-                canMove = false;
-                break;
-            }
+            GameObject failedRotationIndicator = Instantiate(indicatorCube, ghostcubes[i].transform.position, ghostcubes[i].transform.rotation);
+            AutoDestroy IndicatorTime = failedRotationIndicator.GetComponent<AutoDestroy>();
+            IndicatorTime.autoDestroytimerTime = 0.2f;
         }
     }
     private void GhostCheckRotate()
@@ -238,6 +295,14 @@ public class MoveShape : MonoBehaviour
                 break;
             }
         }
+    }
+    private void ResetWalls()
+    {
+        foreach (WallKicks wall in walls)
+        {
+            wall.ResetHit();
+        }
+
     }
     public void ChangeCurrentShape(GameObject newShape)
     {

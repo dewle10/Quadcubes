@@ -15,6 +15,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "MoveDown",
+                    "type": "Button",
+                    "id": "e104cdf6-56fe-4f0c-b7e7-26530bfaf567",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Look",
                     "type": "Value",
                     "id": "6b444451-8a00-4d00-a97e-f47457f736a8",
@@ -22,6 +31,60 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "MMB",
+                    "type": "Button",
+                    "id": "1935964f-93a9-4f75-9f70-14b918ca0678",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Zoom",
+                    "type": "Value",
+                    "id": "f31c5925-f6bc-4144-b87c-76bc94293645",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RotateZ",
+                    "type": "Button",
+                    "id": "f3fe04ca-bd86-4b63-bcdf-f749893d3505",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RotateY",
+                    "type": "Button",
+                    "id": "b5d215dc-7f51-44a1-bc55-70533b662210",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RotateX",
+                    "type": "Button",
+                    "id": "92ee71b3-e97a-423e-b1e3-5d133c9193e9",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Hold",
+                    "type": "Button",
+                    "id": "1bc0b4bf-1f4d-44b4-9607-cf9c62a8e287",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Attack",
@@ -85,33 +148,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "RotateZ",
-                    "type": "Button",
-                    "id": "f3fe04ca-bd86-4b63-bcdf-f749893d3505",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RotateY",
-                    "type": "Button",
-                    "id": "b5d215dc-7f51-44a1-bc55-70533b662210",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RotateX",
-                    "type": "Button",
-                    "id": "92ee71b3-e97a-423e-b1e3-5d133c9193e9",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -150,7 +186,7 @@
                 },
                 {
                     "name": "3D Vector",
-                    "id": "a5414014-a643-451c-bf26-adaafc0616d0",
+                    "id": "f250ec29-a0c6-47e6-86b5-90f8b3e48c74",
                     "path": "3DVector",
                     "interactions": "",
                     "processors": "",
@@ -161,7 +197,7 @@
                 },
                 {
                     "name": "up",
-                    "id": "7d97c724-a473-49f8-bfc8-d71be7618dac",
+                    "id": "08c2cfbb-77dd-4cf7-808a-6f0f934e5aaf",
                     "path": "",
                     "interactions": "",
                     "processors": "",
@@ -172,7 +208,7 @@
                 },
                 {
                     "name": "down",
-                    "id": "871c0c1c-2a94-43a3-9029-5f465730bcc1",
+                    "id": "fca90dcf-c2f9-44ba-856e-baa9011c09ca",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
@@ -183,7 +219,7 @@
                 },
                 {
                     "name": "left",
-                    "id": "c7046089-ae97-41c2-a6ac-bcd0c0732695",
+                    "id": "49440256-5911-46c5-bb25-5075d84aebe4",
                     "path": "<Keyboard>/leftArrow",
                     "interactions": "",
                     "processors": "",
@@ -194,7 +230,7 @@
                 },
                 {
                     "name": "right",
-                    "id": "b58fc2e1-9434-481b-b844-513855c6bd4c",
+                    "id": "fd0fec02-0fdb-4fdf-8f26-357e5a3acc3c",
                     "path": "<Keyboard>/rightArrow",
                     "interactions": "",
                     "processors": "",
@@ -204,8 +240,8 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "Forward",
-                    "id": "f066d9db-dcec-4ce1-872a-f2e7037da4ba",
+                    "name": "forward",
+                    "id": "c78839d8-25d5-48b9-b332-76d55d5c614d",
                     "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
@@ -216,7 +252,7 @@
                 },
                 {
                     "name": "backward",
-                    "id": "5ca36191-c5f0-492a-9812-d08dc3263a6d",
+                    "id": "708b66c0-f99f-476c-a1d5-90174451b6fd",
                     "path": "<Keyboard>/downArrow",
                     "interactions": "",
                     "processors": "",
@@ -576,6 +612,50 @@
                     "action": "RotateX",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "85165f30-ec0e-42bf-b529-07b23598b430",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "MMB",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a9ea8ae0-a2d0-4c31-b610-3d91b50faa7e",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6a2f24e5-aefe-43e8-8ab2-091b5088b4e7",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "MoveDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "04e863f3-a046-4bc7-a55a-765554e8c90a",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Hold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

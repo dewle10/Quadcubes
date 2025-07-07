@@ -9,7 +9,7 @@ public class Falling : MonoBehaviour
     public float fallingSpeed = 1f;
     private float fallingTimerTime = 5.0f;
     private float fallingTimercounter;
-    private int fallenBlocks; 
+    [SerializeField] private int fallenBlocksPoints; 
 
     public GameObject[] cubes;
     LayerMask layerMask;
@@ -18,8 +18,8 @@ public class Falling : MonoBehaviour
     [SerializeField] private LinePoints linePoints;
 
     private Vector3[] indicatorPos;
-    [SerializeField] private GameObject ghostCube;
-    private GameObject[] ghostCubes;
+    [SerializeField] private GameObject ghostIndicator;
+    private GameObject[] ghostIndicators;
 
     public bool _Debug_IsLine;
 
@@ -71,15 +71,14 @@ public class Falling : MonoBehaviour
             {
                 fallingTimercounter = 0;
                 transform.position += Vector3.down;
-                fallenBlocks++;
             }
         }
     }
     public void DropShape()
     {
-        float Distance = RayDistance() - 0.5f; // 0.5 to center of cube
-        transform.position -= new Vector3(0, Distance, 0);
-        fallenBlocks += (int)Distance*2; //droped blocks x2 points
+        float distance = RayDistance() - 0.5f; // 0.5 to center of cube
+        transform.position += Vector3.down * distance;
+        fallenBlocksPoints += (int)distance*2; //droped blocks x2 points
         MakeSolid();
     }
     private void GroundCheck()
@@ -115,12 +114,13 @@ public class Falling : MonoBehaviour
         fallingTimercounter = 0;
         DestroyGhostCubes();
         linePoints.GetFallingSpeed();
+        shapeDispenser.ResetHold();
 
-        if(!_Debug_IsLine)
+        if (!_Debug_IsLine)
         {
             linePoints.PointsCheck(fallingSpeed);
-            linePoints.AddDropPoints(fallenBlocks);
-            shapeDispenser.SpawnShape();
+            linePoints.AddDropPoints(fallenBlocksPoints);
+            shapeDispenser.SpawnShape(false);
         }
     }
     private float RayDistance()
@@ -158,8 +158,8 @@ public class Falling : MonoBehaviour
             if(diferenceDistance > 0.1f)
             {
                 indicatorPos[i] = newIndicatorPos;
-                ghostCubes[i].transform.position = indicatorPos[i];
-                SnapToGrid(0.5f, ghostCubes[i].transform);
+                ghostIndicators[i].transform.position = indicatorPos[i];
+                SnapToGrid(0.5f, ghostIndicators[i].transform);
                 //Debug.Log("ghost");
             }
         }
@@ -167,26 +167,35 @@ public class Falling : MonoBehaviour
     private void GhostIndicatorArrays()
     {
         indicatorPos = new Vector3[cubes.Length];
-        ghostCubes = new GameObject[cubes.Length];
+        ghostIndicators = new GameObject[cubes.Length];
         for (int i = 0; i < cubes.Length; i++)
         {
             indicatorPos[i] = new Vector3(1000f, 1000f, 1000f);
-            ghostCubes[i] = Instantiate(ghostCube, indicatorPos[i], Quaternion.identity);
+            ghostIndicators[i] = Instantiate(ghostIndicator, indicatorPos[i], Quaternion.identity);
         }
+    }
+    private void DestroyGhostCubes()
+    {
+        if (!_Debug_IsLine)
+        {
+            foreach (var obj in ghostIndicators)
+            {
+                Destroy(obj);
+            }
+        }
+    }
+    public void DestroyShape()
+    {
+        DestroyGhostCubes();
+        Destroy(gameObject);
     }
     public void DestroyIfEmpty()
     {
         if (transform.childCount <= 1)
             Destroy(gameObject);
     }
-    private void DestroyGhostCubes()
+    public void ResetFallingTimer()
     {
-        if (!_Debug_IsLine)
-        {
-            foreach (var obj in ghostCubes)
-            {
-                Destroy(obj);
-            }
-        }
+        fallingTimercounter = 0;
     }
 }
