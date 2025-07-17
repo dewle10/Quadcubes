@@ -27,10 +27,6 @@ public class LinePoints : MonoBehaviour
     {
         maxFloorObjNum = gamewidth * gamewidth;
     }
-    void Update()
-    {
-        
-    }
 
     public void AddDropPoints(int fallenBlocks)
     {
@@ -69,6 +65,7 @@ public class LinePoints : MonoBehaviour
             }
         }
         clearedLinesDrop++;
+        SoundManager.PlaySound(SoundType.ClearLine, 1.2f);
         return true;
     }
     private void DestroyLine(int floorNum)
@@ -96,7 +93,7 @@ public class LinePoints : MonoBehaviour
         {
             for (int z = 0; z < gamewidth; z++)
             {
-                for (int y = gameHeight+4; y >= gameHeight; y--) // +4 becouse grid height is higher than game height
+                for (int y = gameHeight+4; y >= gameHeight; y--) // +4 because grid height is higher than game height
                 {
                     if (grid[x, y, z])
                         SceneManager.LoadScene(0);
@@ -135,7 +132,7 @@ public class LinePoints : MonoBehaviour
             case 1: return 1;   // single
             case 2: return 4;   // double
             case 3: return 7;   // triple
-            case 4: return 12;   // Tetris
+            case 4: return 12;   // Quad
             default: return 1;  // no lines, or more than 4
         }
     }

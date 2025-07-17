@@ -18,7 +18,7 @@ public class MoveShape : MonoBehaviour
     private bool rotateYNow;
     private bool rotateZNow;
     
-    [SerializeField] private float dasTime = 0.2f;    //Delayed Auto Shift DAS
+    [SerializeField] private float dasTime = 0.2f;  //Delayed Auto Shift DAS
     private float dasCounter;
     [SerializeField] private float arrTime = 0.05f; //repeatRate ARR
     private float arrCounter;
@@ -44,10 +44,10 @@ public class MoveShape : MonoBehaviour
     [SerializeField] private GameObject indicatorCube;
     private WallKicks[] walls;
 
-    //Sound
-    [SerializeField] private AudioSource audioMove;
-    [SerializeField] private AudioSource audioRotate;
-    [SerializeField] private AudioSource audioDrop;
+    ////Sound
+    //[SerializeField] private AudioSource audioMove;
+    //[SerializeField] private AudioSource audioRotate;
+    //[SerializeField] private AudioSource audioDrop;
 
     private void Awake()
     {
@@ -136,15 +136,14 @@ public class MoveShape : MonoBehaviour
             //Debug.Log(wallKickDirection);
             directionVector = wallKickDirection;
             TryMove();
-            wallKick = false;
         }
         if(!canMove && wallKick)
         {
             FailedRotationIndicator();
             canRotate = false;
-            wallKick = false;
         }
 
+        wallKick = false;
         ResetWalls();
         currentGhost.transform.rotation = currentShape.transform.rotation;
 
@@ -152,7 +151,7 @@ public class MoveShape : MonoBehaviour
         if (canRotate)
         {
             currentShape.transform.rotation = Quaternion.Euler(Rotation * 90f) * currentShape.transform.rotation;
-            audioRotate.Play();
+            SoundManager.PlaySound(SoundType.Rotate);
         }
 
         rotateXNow = rotateYNow = rotateZNow = false;
@@ -182,7 +181,7 @@ public class MoveShape : MonoBehaviour
         {
             Falling falling = currentShape.GetComponent<Falling>();
             falling.DropShape();
-            audioDrop.Play();
+            SoundManager.PlaySound(SoundType.Place);
         }
     }
     private void TryMove()
@@ -226,20 +225,13 @@ public class MoveShape : MonoBehaviour
         if (canMoveX ^ canMoveZ)
         {
             if (canMoveX)
-            {
-                currentShape.transform.position += new Vector3(directionVector.x,0,0);
-                audioMove.Play();
-            }
+                NowMove(new Vector3(directionVector.x, 0, 0));
             else if (canMoveZ)
-            {
-                currentShape.transform.position += new Vector3(0, 0, directionVector.z);
-                audioMove.Play();
-            }
+                NowMove(new Vector3(0, 0, directionVector.z));
         }
         else if (canMove)
         {
-            currentShape.transform.position += directionVector;
-            audioMove.Play();
+            NowMove(directionVector);
 
             if (directionVector.y < 0) // if down
             {
@@ -247,6 +239,11 @@ public class MoveShape : MonoBehaviour
                 //currentShape.GetComponent<Falling>().ResetFallingTimer();
             }
         }
+    }
+    private void NowMove(Vector3 dir)
+    {
+        currentShape.transform.position += dir;
+        SoundManager.PlaySound(SoundType.Move, 0.8f);
     }
     private Vector3 RemapBySector(Vector3 inputVec, int sector)
     {
@@ -278,6 +275,7 @@ public class MoveShape : MonoBehaviour
     }
     private void FailedRotationIndicator()
     {
+        SoundManager.PlaySound(SoundType.CantRotate);
         for (int i = 0; i < currentGhost.childCount; i++)
         {
             GameObject failedRotationIndicator = Instantiate(indicatorCube, ghostcubes[i].transform.position, ghostcubes[i].transform.rotation);

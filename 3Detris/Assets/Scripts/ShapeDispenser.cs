@@ -73,24 +73,33 @@ public class ShapeDispenser : MonoBehaviour
     }
     private void HoldShape()
     {
-        if (holdAction.WasPressedThisFrame() && !holding)
+        if (holdAction.WasPressedThisFrame())
         {
-            holding = true;
-            currentShape.GetComponent<Falling>().DestroyShape();
-            if (holdShapenum >= 0) 
+            if (!holding)
             {
-                SpawnShape(true);
+                holding = true;
+                currentShape.GetComponent<Falling>().DestroyShape();
+                if (holdShapenum >= 0) 
+                {
+                    SpawnShape(true);
+                }
+                else //first time
+                {
+                    holdShapenum = currentShapenum;
+                    holdShape = Instantiate(displayShapes[holdShapenum], cam.transform);
+                    holdShape.transform.position = holdShapePos.position;
+                    SpawnShape(false);
+                }
+                SoundManager.PlaySound(SoundType.Hold, 1.2f);
             }
-            else //first time
+            else
             {
-                holdShapenum = currentShapenum;
-                holdShape = Instantiate(displayShapes[holdShapenum], cam.transform);
-                holdShape.transform.position = holdShapePos.position;
-                SpawnShape(false);
+                SoundManager.PlaySound(SoundType.CantHold);
             }
+
         }
     }
-    public void ResetHold()
+    public void ResetHold() //on place
     {
         holding = false;
     }
