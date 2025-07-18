@@ -26,10 +26,6 @@ public class Falling : MonoBehaviour
     private void Awake()
     {
         layerMask = LayerMask.GetMask("Solid");
-        if (_Debug_IsLine)
-        {
-            MakeSolid();
-        }
     }
     private void Start()
     {
@@ -38,6 +34,10 @@ public class Falling : MonoBehaviour
         if (!_Debug_IsLine)
             GhostIndicatorArrays();
         fallingSpeed = linePoints.GetFallingSpeed();
+        if (_Debug_IsLine)
+        {
+            MakeSolid();
+        }
     }
     private void FixedUpdate()
     {
@@ -108,8 +108,9 @@ public class Falling : MonoBehaviour
         gameObject.layer = 6;
         foreach (GameObject cube in cubes)
         {
-                cube.layer = 6;
-            linePoints.AddToGrid(cube.transform);
+            cube.layer = 6; //solid
+            GridManager.AddToGrid(cube.transform);
+            RowColors.ChangeColor(cube);
         }
         fallingTimercounter = 0;
         DestroyGhostCubes();

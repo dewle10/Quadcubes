@@ -206,19 +206,19 @@ public class MoveShape : MonoBehaviour
                     if (!ghostDetections[i].GetghostHitMove(new Vector3(directionVector.x, 0, 0)))
                     {
                         canMoveX = true;
-                        Debug.Log($"canMoveX{i}");
+                        //Debug.Log($"canMoveX{i}");
                         continue;
                     }
                     if (!ghostDetections[i].GetghostHitMove(new Vector3(0, 0, directionVector.z)))
                     {
                         canMoveZ = true;
-                        Debug.Log($"canMoveZ{i}");
+                        //Debug.Log($"canMoveZ{i}");
                         continue;
                     }
                 }
                 canMoveX = false;
                 canMoveZ = false;
-                Debug.Log("brake");
+                //Debug.Log("brake");
                 break;
             }
         }

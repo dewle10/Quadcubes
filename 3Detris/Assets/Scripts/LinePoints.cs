@@ -6,7 +6,7 @@ public class LinePoints : MonoBehaviour
 {
     private int points;
     private int clearedLinesGame; // all game
-    private int clearedLinesDrop; // this drop
+    static public int clearedLinesDrop; // this drop
     [SerializeField] private int linesToLevelup = 5;
     [SerializeField] private float level = 1; //falling speed & points mod
     [SerializeField] private bool combo;
@@ -14,18 +14,11 @@ public class LinePoints : MonoBehaviour
 
     private int maxFloorObjNum;
 
-    private static int gamewidth = 6;
-    private static int gameHeight = 12;
     [SerializeField] private Transform gameScene;
     [SerializeField] private TMP_Text pointsText;
-
-    //GRID
-    public static Transform[,,] grid = new Transform[gamewidth, gameHeight+5, gamewidth];
-
-
     void Start()
     {
-        maxFloorObjNum = gamewidth * gamewidth;
+        maxFloorObjNum = GridManager.gamewidth * GridManager.gamewidth;
     }
 
     public void AddDropPoints(int fallenBlocks)
@@ -35,12 +28,12 @@ public class LinePoints : MonoBehaviour
     }
     public void PointsCheck(float fallSpeed)
     {
-        for (int i = gameHeight; i >= 0; i--)
+        for (int i = GridManager.gameHeight; i >= 0; i--)
         {
-            if (LineCheck(i))
+            if (GridManager.LineCheck(i))
             {
-                DestroyLine(i);
-                ShiftDownCubesAbove(i);
+                GridManager.DestroyLine(i);
+                GridManager.ShiftDownCubesAbove(i);
             }
         }
         if(clearedLinesDrop >= 1)
@@ -52,54 +45,7 @@ public class LinePoints : MonoBehaviour
         else
             combo = false;
 
-            LossCheck();
-    }
-    private bool LineCheck(int y)
-    {
-        for (int x = 0; x < gamewidth; x++)
-        {
-            for (int z = 0; z < gamewidth; z++)
-            {
-                if (grid[x, y, z] == null)
-                    return false;
-            }
-        }
-        clearedLinesDrop++;
-        SoundManager.PlaySound(SoundType.ClearLine, 1.2f);
-        return true;
-    }
-    private void DestroyLine(int floorNum)
-    {
-        for (int x = 0; x < gamewidth; x++)
-        {
-            for (int z = 0; z < gamewidth; z++)
-            {
-                Transform cube = grid[x, floorNum, z];
-                if (cube != null)
-                {
-                    Destroy(cube.gameObject);
-                    grid[x, floorNum, z] = null;
-                }
-                else
-                {
-                    Debug.Log("Error: No cube to Destroy");
-                }
-            }
-        }
-    }
-    private void LossCheck()
-    {
-        for (int x = 0; x < gamewidth; x++)
-        {
-            for (int z = 0; z < gamewidth; z++)
-            {
-                for (int y = gameHeight+4; y >= gameHeight; y--) // +4 because grid height is higher than game height
-                {
-                    if (grid[x, y, z])
-                        SceneManager.LoadScene(0);
-                }
-            }
-        }
+            GridManager.LossCheck();
     }
     private void SetPoints(float levelPointsMod)
     {
@@ -140,40 +86,6 @@ public class LinePoints : MonoBehaviour
     {
         pointsText.text = points.ToString();
     }
-
-    //grid
-    public void AddToGrid(Transform cubePos)
-    {
-        int x = (int)cubePos.position.x;
-        int y = (int)cubePos.position.y;
-        int z = (int)cubePos.position.z;
-        grid[x, y, z] = cubePos;
-        //Debug.Log(cubePos.position);
-        //Debug.Log(x + " " + y + " " + z);
-    }
-    private void ShiftDownCubesAbove(int floorNum)
-    {
-        for (int y = floorNum + 1; y < gameHeight + 5; y++)
-        {
-            for (int x = 0; x < gamewidth; x++)
-            {
-                for (int z = 0; z < gamewidth; z++)
-                {
-                    Transform cube = grid[x, y, z];
-                    if (cube != null)
-                    {
-                        grid[x,y-1,z] = cube;
-                        grid[x, y, z] = null;
-
-                        cube.position += Vector3.down;
-                    }
-
-                }
-            }
-        }
-        //Debug.Log(floorNum);
-    }
-
     public float GetFallingSpeed()
     {
         return level;

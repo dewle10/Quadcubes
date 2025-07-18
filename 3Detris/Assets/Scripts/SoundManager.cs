@@ -37,7 +37,7 @@ public class SoundManager : MonoBehaviour
 
     public static void PlaySound(SoundType sound, float volume = 1f)
     {
-        instance.audioSource.PlayOneShot(instance.sounds[(int)sound].soundClip, volume);
+        instance.audioSource.PlayOneShot(instance.sounds[(int)sound].SoundClip, volume);
     }
 
 #if UNITY_EDITOR
@@ -54,7 +54,7 @@ public class SoundManager : MonoBehaviour
 [Serializable] 
 public struct SoundList
 {
-    public AudioClip soundClip {  get => _soundClip;}
+    readonly public AudioClip SoundClip { get => soundClip; }
     [HideInInspector] public string name;
-    [SerializeField] private AudioClip _soundClip;
+    [SerializeField] private AudioClip soundClip;
 }
