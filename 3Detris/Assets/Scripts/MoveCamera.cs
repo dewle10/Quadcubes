@@ -10,6 +10,7 @@ public class MoveCamera : MonoBehaviour
     [SerializeField] private float horizontalSpeed;
     [SerializeField] private float verticalSpeed;
     [SerializeField] private float zoomSpeed;
+    [SerializeField] private float padLookSpeed;
     [Header("Limits")]
     [SerializeField] private float minAngleX;
     [SerializeField] private float maxAngleX;
@@ -22,25 +23,30 @@ public class MoveCamera : MonoBehaviour
     [SerializeField] private float startAngleX;
     [SerializeField] private float startAngleY;
     //Inputs
-    private InputAction lookAction, mmbAction, zoomAction;
+    private PlayerInput playerInput;
+    private InputAction lookAction, zoomAction;
+    private bool usingPad;
     //Targets
-    [SerializeField] private float targetAngleX, targetAngleY, targetDistance;
+    private float targetAngleX, targetAngleY, targetDistance;
     //Smoothed
-    [SerializeField] private float smoothAngleX, smoothAngleY, smoothDistance;
+    private float smoothAngleX, smoothAngleY, smoothDistance;
     //Velocities for SmoothDamp
     private float angleXVelocity, angleYVelocity, distanceVelocity;
 
     private void Awake()
     {
         lookAction = InputSystem.actions.FindAction("Look");
-        mmbAction = InputSystem.actions.FindAction("MMB");
         zoomAction = InputSystem.actions.FindAction("Zoom");
+        playerInput = gameObject.GetComponent<PlayerInput>();
+    }
 
+    private void Start()
+    {
         targetDistance = Vector3.Distance(pivotPoint.position, cam.transform.position);
         smoothDistance = targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
 
         float sAngleX = -startAngleX;
-        float sAngleY = startAngleY-180f;
+        float sAngleY = startAngleY - 180f;
         startAngleX = Mathf.Clamp(sAngleX, minAngleX, maxAngleX);
         targetAngleX = smoothAngleX = sAngleX;
         targetAngleY = smoothAngleY = sAngleY;
@@ -49,21 +55,28 @@ public class MoveCamera : MonoBehaviour
         Vector3 startOffset = rot * Vector3.forward * smoothDistance;
         cam.transform.position = pivotPoint.position + startOffset;
         cam.transform.LookAt(pivotPoint.position);
+
+        
+        horizontalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
+        verticalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
+        padLookSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
     }
     private void OnEnable()
     {
         lookAction.Enable();
-        mmbAction.Enable();
         zoomAction.Enable();
+        playerInput.onControlsChanged += OnControlsChanged;
     }
     private void OnDisable()
     {
         lookAction.Disable();
-        mmbAction.Disable();
         zoomAction.Disable();
+        playerInput.onControlsChanged -= OnControlsChanged;
     }
     private void Update()
     {
+        OnControlsChanged(playerInput);
+
         //Zoom target
         float scroll = zoomAction.ReadValue<Vector2>().y;
         if (Mathf.Abs(scroll) > 0.01f)
@@ -73,9 +86,13 @@ public class MoveCamera : MonoBehaviour
         }
 
         //Rotation target
-        if (mmbAction.IsPressed())
+        if (lookAction.IsPressed())
         {
             Vector2 delta = lookAction.ReadValue<Vector2>();
+            if (usingPad) 
+            {
+                delta *= padLookSpeed;
+            }
             targetAngleY += delta.x * horizontalSpeed * Time.deltaTime;
             targetAngleX = Mathf.Clamp(targetAngleX + delta.y * verticalSpeed * Time.deltaTime, minAngleX, maxAngleX);
         }
@@ -93,5 +110,11 @@ public class MoveCamera : MonoBehaviour
         cam.transform.position = pivotPoint.position + offset;
 
         cam.transform.LookAt(pivotPoint.position);
+    }
+
+    void OnControlsChanged(PlayerInput input)
+    {
+        string scheme = input.currentControlScheme;
+        usingPad = scheme == "Gamepad";
     }
 }

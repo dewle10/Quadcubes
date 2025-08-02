@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Grid2
+  m_Name: Grid24x4
   m_Shader: {fileID: 4800000, guid: f0c30946125165d45af8a5f016eba0d0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -115,7 +115,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _GridSize: 6
-    - _GridSizeX: 6
+    - _GridSizeX: 4
     - _GridSizeY: 12
     - _LineWidth: 0.05
     - _Metallic: 0

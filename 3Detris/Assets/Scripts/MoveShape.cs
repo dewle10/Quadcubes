@@ -8,6 +8,7 @@ public class MoveShape : MonoBehaviour
     public InputActionAsset inputAction;
 
     private InputAction moveAction;
+    private InputAction moveDownAction;
     private InputAction rotateActionX;
     private InputAction rotateActionY;
     private InputAction rotateActionZ;
@@ -25,7 +26,7 @@ public class MoveShape : MonoBehaviour
 
     //CONTROL
     private Vector3 directionVector;
-    private Vector3 inputVector;
+    //private Vector2 inputVector;
     private float rotateXTurn;
     private float rotateYTurn;
     private float rotateZTurn;
@@ -52,6 +53,7 @@ public class MoveShape : MonoBehaviour
     private void Awake()
     {
         moveAction = InputSystem.actions.FindAction("Move");
+        moveDownAction = InputSystem.actions.FindAction("MoveDown");
         rotateActionX = InputSystem.actions.FindAction("RotateX");
         rotateActionY = InputSystem.actions.FindAction("RotateY");
         rotateActionZ = InputSystem.actions.FindAction("RotateZ");
@@ -62,9 +64,6 @@ public class MoveShape : MonoBehaviour
     }
     void Update()
     {
-        rotateXTurn = rotateActionX.ReadValue<float>();
-        rotateYTurn = rotateActionY.ReadValue<float>();
-        rotateZTurn = rotateActionZ.ReadValue<float>();
         CheckInput();
     }
     private void FixedUpdate()
@@ -72,7 +71,34 @@ public class MoveShape : MonoBehaviour
         Move();
         Rotate();
     }
+    private void CheckInput()
+    {
+        if (moveAction.WasPressedThisFrame() || moveDownAction.WasPressedThisFrame())
+        {
+            moveNow = true;
+            TryMove();
+        }
+        if (!moveAction.IsPressed() && !moveDownAction.IsPressed())
+        {
+            dasCounter = 0f;
+            arrCounter = 0f;
+            moveNow = false;
+        }
 
+        if (rotateActionX.WasPressedThisFrame())
+            rotateXNow = true;
+        if (rotateActionY.WasPressedThisFrame())
+            rotateYNow = true;
+        if (rotateActionZ.WasPressedThisFrame())
+            rotateZNow = true;
+
+        if (DropAction.WasPressedThisFrame())
+        {
+            Falling falling = currentShape.GetComponent<Falling>();
+            falling.DropShape();
+            SoundManager.PlaySound(SoundType.Place);
+        }
+    }
     private void Move()
     {
         if (moveNow)
@@ -97,6 +123,10 @@ public class MoveShape : MonoBehaviour
 
         int sector = cameraTracker.GetCameraSector();
         Vector3 inputRot = Vector3.zero;
+
+        rotateXTurn = rotateActionX.ReadValue<float>();
+        rotateYTurn = rotateActionY.ReadValue<float>();
+        rotateZTurn = rotateActionZ.ReadValue<float>();
 
         if (rotateXNow)
             inputRot = new Vector3(rotateXTurn, 0, 0);
@@ -156,34 +186,6 @@ public class MoveShape : MonoBehaviour
 
         rotateXNow = rotateYNow = rotateZNow = false;
     }
-    private void CheckInput()
-    {
-        if (moveAction.WasPressedThisFrame())
-        {
-            moveNow = true;
-            TryMove();
-        }
-        if (moveAction.WasReleasedThisFrame())
-        {
-            dasCounter = 0f;
-            arrCounter = 0f;
-            moveNow = false;
-        }
-
-        if (rotateActionX.WasPressedThisFrame())
-            rotateXNow = true;
-        if (rotateActionY.WasPressedThisFrame())
-            rotateYNow = true;
-        if (rotateActionZ.WasPressedThisFrame())
-            rotateZNow = true;
-
-        if (DropAction.WasPressedThisFrame())
-        {
-            Falling falling = currentShape.GetComponent<Falling>();
-            falling.DropShape();
-            SoundManager.PlaySound(SoundType.Place);
-        }
-    }
     private void TryMove()
     {
         canMove = true;
@@ -192,9 +194,12 @@ public class MoveShape : MonoBehaviour
 
         if (!wallKick)
         {
+            Vector2 inputVector = VectorSign(moveAction.ReadValue<Vector2>());
+            float inputDown = -moveDownAction.ReadValue<float>();
+            Vector3 inputVector3 = Vector2To3(inputVector, inputDown);
+
             sector = cameraTracker.GetCameraSector();
-            inputVector = moveAction.ReadValue<Vector3>();
-            directionVector = RemapBySector(inputVector,sector);
+            directionVector = RemapBySector(inputVector3, sector);
         }
         for (int i = 0; i < currentGhost.childCount; i++)
         {
@@ -306,5 +311,18 @@ public class MoveShape : MonoBehaviour
     {
         currentShape = newShape;
         GetGhost();
+    }
+    private Vector3 VectorSign(Vector3 vec)
+    {
+        float threshold = 0.35f;
+        return new Vector3(
+        Mathf.Abs(vec.x) > threshold ? Mathf.Sign(vec.x) : 0f,
+        Mathf.Abs(vec.y) > threshold ? Mathf.Sign(vec.y) : 0f,
+        Mathf.Abs(vec.z) > threshold ? Mathf.Sign(vec.z) : 0f
+    );
+    }
+    private Vector3 Vector2To3(Vector3 vec, float down)
+    {
+        return new Vector3(vec.x, down, vec.y);
     }
 }

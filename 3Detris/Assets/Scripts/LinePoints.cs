@@ -2,23 +2,35 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public enum GameMode
+{
+    Casual,
+    Challange
+}
+
 public class LinePoints : MonoBehaviour
 {
-    private int points;
+    static private int points;
     private int clearedLinesGame; // all game
     static public int clearedLinesDrop; // this drop
     [SerializeField] private int linesToLevelup = 5;
-    [SerializeField] private float level = 1; //falling speed & points mod
+    private int linesToLevelupCount;
+	[SerializeField] private float level = 1; //falling speed & points mod
     [SerializeField] private bool combo;
     [SerializeField] private int comboMod;
+	static public GameMode gameMode;
 
-    private int maxFloorObjNum;
+	private int maxFloorObjNum;
 
     [SerializeField] private Transform gameScene;
     [SerializeField] private TMP_Text pointsText;
-    void Start()
+    [SerializeField] private TMP_Text levelText;
+
+    static public int Score { get => points; }
+
+	void Start()
     {
-        maxFloorObjNum = GridManager.gamewidth * GridManager.gamewidth;
+        maxFloorObjNum = GridManager.gameWidth * GridManager.gameWidth;
     }
 
     public void AddDropPoints(int fallenBlocks)
@@ -67,20 +79,25 @@ public class LinePoints : MonoBehaviour
 
         UpdatePoints();
 
-        clearedLinesGame++;
-        if (clearedLinesGame % linesToLevelup == 0)
+        clearedLinesGame += clearedLinesDrop;
+		linesToLevelupCount += clearedLinesDrop;
+		if (gameMode == GameMode.Challange && linesToLevelupCount - linesToLevelup >= 0)
+        {
             level += 0.5f;
+			levelText.text = level.ToString();
+            linesToLevelupCount -= linesToLevelup;
+		}
     }
     private int GetLinesPointsMod()
     {
-        switch (clearedLinesDrop)
+        return clearedLinesDrop switch
         {
-            case 1: return 1;   // single
-            case 2: return 4;   // double
-            case 3: return 7;   // triple
-            case 4: return 12;   // Quad
-            default: return 1;  // no lines, or more than 4
-        }
+            1 => 1,// single
+            2 => 4,// double
+            3 => 7,// triple
+            4 => 12,// Quad
+            _ => 1,// no lines, or more than 4
+        };
     }
     private void UpdatePoints()
     {

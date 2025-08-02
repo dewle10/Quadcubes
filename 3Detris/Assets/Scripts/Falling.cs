@@ -21,6 +21,8 @@ public class Falling : MonoBehaviour
     [SerializeField] private GameObject ghostIndicator;
     private GameObject[] ghostIndicators;
 
+    [SerializeField] private GameObject lights;
+
     public bool _Debug_IsLine;
 
     private void Awake()
@@ -119,6 +121,7 @@ public class Falling : MonoBehaviour
 
         if (!_Debug_IsLine)
         {
+            lights.SetActive(false);
             linePoints.PointsCheck(fallingSpeed);
             linePoints.AddDropPoints(fallenBlocksPoints);
             shapeDispenser.SpawnShape(false);
