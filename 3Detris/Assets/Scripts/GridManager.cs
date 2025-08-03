@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 
@@ -11,9 +12,18 @@ public class GridManager : MonoBehaviour
 
     static private Leaderboard leaderboard;
 
+    //[SerializeField] static private GameObject cubeRemover;
+    static private GameObject walls;
+    static private GameObject outOfBounds;
+    static private Transform center;
+
+
     private void Start()
     {
         leaderboard = gameObject.GetComponent<Leaderboard>();
+        walls = GameObject.Find("walls");
+        center = GameObject.Find("Center").transform;
+        outOfBounds = GameObject.FindWithTag("OutOfBounds");
     }
 
     public static void AddToGrid(Transform cubeTran)
@@ -58,9 +68,29 @@ public class GridManager : MonoBehaviour
                 {
                     if (grid[x, y, z])
                     {
-                        SceneManager.LoadScene(0);
-                        //Debug.Log("loss");
-                        leaderboard.AddScore("YOU", LinePoints.Score, (BoardSize)gameWidth, LinePoints.gameMode);
+                        for (int xx = 0; xx < gameWidth; xx++)
+                        {
+                            for (int yy = 0; yy < gameHeight + 4; yy++)
+                            {
+                                for (int zz = 0; zz < gameWidth; zz++)
+                                {
+                                    if (grid[xx, yy, zz])
+                                    {
+                                        MeshRenderer renderer = grid[xx, yy, zz].gameObject.GetComponentInChildren<MeshRenderer>();
+                                        renderer.material.color = Color.red;
+                                        grid[xx, yy, zz].gameObject.AddComponent<Rigidbody>();
+                                    }
+                                }
+                            }
+                        }
+
+                        walls.SetActive(false);
+                        outOfBounds.SetActive(false);
+                        Explode();
+                        Debug.Log("loss");
+                        //SceneManager.LoadScene(0);
+
+                        //leaderboard.AddScore("YOU", LinePoints.Score, (BoardSize)gameWidth, LinePoints.gameMode);
                         return;
                     }
                 }
@@ -99,5 +129,18 @@ public class GridManager : MonoBehaviour
         LinePoints.clearedLinesDrop++;
         SoundManager.PlaySound(SoundType.ClearLine, 1.2f);
         return true;
+    }
+    private static void Explode()
+    {
+        Collider[] colliders = Physics.OverlapSphere(center.position, 5f);
+
+        foreach (Collider hit in colliders)
+        {
+            Rigidbody rb = hit.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.AddExplosionForce(50f, center.position, 5f, 0.5f, ForceMode.Impulse);
+            }
+        }
     }
 }
