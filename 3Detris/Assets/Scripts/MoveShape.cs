@@ -64,12 +64,16 @@ public class MoveShape : MonoBehaviour
     }
     void Update()
     {
-        CheckInput();
+        if (!GridManager.gameOver && !Pause.isPaused)
+            CheckInput();
     }
     private void FixedUpdate()
     {
-        Move();
-        Rotate();
+        if (!GridManager.gameOver && !Pause.isPaused)
+        {
+            Move();
+            Rotate();
+        }
     }
     private void CheckInput()
     {

@@ -47,33 +47,41 @@ public class ShapeDispenser : MonoBehaviour
     }
     public void SpawnShape(bool isHoldShape)
     {
-        if (!isHoldShape)
+        GridManager.LossCheck();
+        if (!GridManager.gameOver)
         {
-            previousShapenum = currentShapenum;
-            currentShapenum = nextShapenum;
-            nextShapenum = RandomShapeNum();
+            if (!isHoldShape)
+            {
+                previousShapenum = currentShapenum;
+                currentShapenum = nextShapenum;
+                nextShapenum = RandomShapeNum();
 
-            if(nextShape != null)
-                Destroy(nextShape);
-            nextShape = Instantiate(displayShapes[nextShapenum], cam.transform);
-            nextShape.transform.position = nextShapePos.position;
-        }
-        else
-        {
-            Destroy(holdShape);
-            int holdNum = holdShapenum;
-            holdShapenum = currentShapenum;
-            currentShapenum = holdNum;
-            holdShape = Instantiate(displayShapes[holdShapenum], cam.transform);
-            holdShape.transform.position = holdShapePos.position;
+                if(nextShape != null)
+                    Destroy(nextShape);
+                nextShape = Instantiate(displayShapes[nextShapenum], cam.transform);
+                nextShape.transform.position = nextShapePos.position;
+            }
+            else
+            {
+                Destroy(holdShape);
+                int holdNum = holdShapenum;
+                holdShapenum = currentShapenum;
+                currentShapenum = holdNum;
+                holdShape = Instantiate(displayShapes[holdShapenum], cam.transform);
+                holdShape.transform.position = holdShapePos.position;
 
+            }
+            MakeShape();
         }
-            currentShape = Instantiate(shapes[currentShapenum], shapeSpawnPos.position, Quaternion.identity);
-            playerController.ChangeCurrentShape(currentShape);
+    }
+    private void MakeShape()
+    {
+        currentShape = Instantiate(shapes[currentShapenum], shapeSpawnPos.position, Quaternion.identity);
+        playerController.ChangeCurrentShape(currentShape);
     }
     private void HoldShape()
     {
-        if (holdAction.WasPressedThisFrame())
+        if (holdAction.WasPressedThisFrame() && !GridManager.gameOver && !Pause.isPaused)
         {
             if (!holding)
             {

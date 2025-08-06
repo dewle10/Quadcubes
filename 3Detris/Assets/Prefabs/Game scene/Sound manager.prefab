@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9014530144739965292}
   - component: {fileID: 1434056619573510860}
+  - component: {fileID: 371956524764511455}
   - component: {fileID: 7500296815057052032}
   m_Layer: 0
   m_Name: Sound manager
@@ -130,6 +131,103 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!82 &371956524764511455
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6540322653377935429}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 2faa5f5d557e84647b861fb96b75d23b, type: 2}
+  m_audioClip: {fileID: 8300000, guid: e2e22d59c446456429955e92c47a78f9, type: 3}
+  m_Resource: {fileID: 8300000, guid: e2e22d59c446456429955e92c47a78f9, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.3
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &7500296815057052032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,10 +256,16 @@ MonoBehaviour:
   - name: ClearLine
     soundClip: {fileID: 8300000, guid: 490b27c03cdee1b47b7cda3903de49f7, type: 3}
   - name: ClickButton
-    soundClip: {fileID: 0}
+    soundClip: {fileID: 8300000, guid: d16ef83517cef014ba5425a9f9b1892b, type: 3}
   - name: HoverButton
-    soundClip: {fileID: 0}
+    soundClip: {fileID: 8300000, guid: 55c3be886ba44904e8ac5ed2eb4f5a47, type: 3}
   - name: GameStart
     soundClip: {fileID: 0}
   - name: GameOver
-    soundClip: {fileID: 0}
+    soundClip: {fileID: 8300000, guid: eaddbbbdca3bb9c4e952f416fda11ac5, type: 3}
+  - name: ColorChange
+    soundClip: {fileID: 8300000, guid: 5fde4175964da674c8c6f5f4375ae498, type: 3}
+  - name: Explode
+    soundClip: {fileID: 8300000, guid: d38b8755fae8d104aabd90d1af31feff, type: 3}
+  audioSource: {fileID: 1434056619573510860}
+  musicSource: {fileID: 371956524764511455}

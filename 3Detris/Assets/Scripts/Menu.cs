@@ -177,7 +177,6 @@ public class Menu : MonoBehaviour
         PlayerPrefs.SetFloat(OptionsValues.SensitivityPad.ToString(), Sensitivity);
     }
 
-
     private void ResolutionStart()
     {
         resolutions = Screen.resolutions;

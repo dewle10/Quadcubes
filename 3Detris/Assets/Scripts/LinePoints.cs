@@ -7,6 +7,12 @@ public enum GameMode
     Casual,
     Challange
 }
+public enum BoardSize
+{
+    X4 = 4,
+    X5 = 5,
+    X6 = 6
+}
 
 public class LinePoints : MonoBehaviour
 {
@@ -56,8 +62,6 @@ public class LinePoints : MonoBehaviour
         }
         else
             combo = false;
-
-            GridManager.LossCheck();
     }
     private void SetPoints(float levelPointsMod)
     {

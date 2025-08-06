@@ -2,12 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum BoardSize
-{
-    X4 = 4,
-    X5 = 5,
-    X6 = 6
-}
 [System.Serializable]
 public class ScoreEntry
 {

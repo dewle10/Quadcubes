@@ -16,6 +16,8 @@ public enum SoundType
     HoverButton,
     GameStart,
     GameOver,
+    ColorChange,
+    Explode
 }
 
 [RequireComponent(typeof(AudioSource))]
@@ -24,7 +26,8 @@ public class SoundManager : MonoBehaviour
     private static SoundManager instance;
 
     [SerializeField] private SoundList[] sounds;
-    private AudioSource audioSource;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioSource musicSource;
 
     private void Awake()
     {
@@ -32,12 +35,20 @@ public class SoundManager : MonoBehaviour
     }
     private void Start()
     {
-        audioSource = GetComponent<AudioSource>();
+        SoundManager.PlayMusic();
     }
 
     public static void PlaySound(SoundType sound, float volume = 1f)
     {
         instance.audioSource.PlayOneShot(instance.sounds[(int)sound].SoundClip, volume);
+    }
+    public static void PlayMusic()
+    {
+        instance.musicSource.Play();
+    }
+    public static void StopMusic()
+    {
+        instance.musicSource.Stop();
     }
 
 #if UNITY_EDITOR
