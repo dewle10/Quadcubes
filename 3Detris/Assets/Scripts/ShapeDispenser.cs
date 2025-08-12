@@ -5,6 +5,7 @@ public class ShapeDispenser : MonoBehaviour
 {
     public GameObject[] shapes;
     public GameObject[] displayShapes;
+    public GameObject[] holdShapes;
     private MoveShape playerController;
     private GameObject currentShape;
     private GameObject holdShape;
@@ -36,9 +37,8 @@ public class ShapeDispenser : MonoBehaviour
         HoldShape();
     }
     public int RandomShapeNum()
-    { 
-        int num = 0;
-        num = Random.Range(0, shapes.Length); 
+    {
+        int num = Random.Range(0, shapes.Length); 
         while (num == previousShapenum && previousShapenum == currentShapenum)
         {
             num = Random.Range(0, shapes.Length);
@@ -64,10 +64,8 @@ public class ShapeDispenser : MonoBehaviour
             else
             {
                 Destroy(holdShape);
-                int holdNum = holdShapenum;
-                holdShapenum = currentShapenum;
-                currentShapenum = holdNum;
-                holdShape = Instantiate(displayShapes[holdShapenum], cam.transform);
+                (currentShapenum, holdShapenum) = (holdShapenum, currentShapenum);
+                holdShape = Instantiate(holdShapes[holdShapenum], cam.transform);
                 holdShape.transform.position = holdShapePos.position;
 
             }
@@ -94,7 +92,7 @@ public class ShapeDispenser : MonoBehaviour
                 else //first time
                 {
                     holdShapenum = currentShapenum;
-                    holdShape = Instantiate(displayShapes[holdShapenum], cam.transform);
+                    holdShape = Instantiate(holdShapes[holdShapenum], cam.transform);
                     holdShape.transform.position = holdShapePos.position;
                     SpawnShape(false);
                 }

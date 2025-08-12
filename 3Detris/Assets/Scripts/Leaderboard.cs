@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -18,7 +19,8 @@ public class LeaderboardData
 
 public class Leaderboard : MonoBehaviour
 {
-    static readonly string prefKey = "Leaderboard";
+    private const string FileName = "leaderboard.json";
+    private static string FilePath => Path.Combine(Application.persistentDataPath, FileName);
 
     public void AddScore(string name, int score, BoardSize size, GameMode mode)
     {
@@ -37,23 +39,13 @@ public class Leaderboard : MonoBehaviour
     private void SaveLeaderboard(LeaderboardData data)
     {
         string json = JsonUtility.ToJson(data);
-        PlayerPrefs.SetString(prefKey, json);
-        PlayerPrefs.Save();
+        File.WriteAllText(FilePath, json);
     }
 
-    private LeaderboardData LoadLeaderboard()
+    public static LeaderboardData LoadLeaderboard()
     {
-        if (!PlayerPrefs.HasKey(prefKey)) return new LeaderboardData();
-        string json = PlayerPrefs.GetString(prefKey);
+        if (!File.Exists(FilePath)) return new LeaderboardData();
+        string json = File.ReadAllText(FilePath);
         return JsonUtility.FromJson<LeaderboardData>(json);
-    }
-    static public List<ScoreEntry> GetScores()
-    {
-        if (!PlayerPrefs.HasKey(prefKey)) 
-        {
-            return new LeaderboardData().scores;
-        }
-        string json = PlayerPrefs.GetString(prefKey);
-        return JsonUtility.FromJson<LeaderboardData>(json).scores;
     }
 }

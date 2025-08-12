@@ -2,12 +2,13 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
+using System.Net.Sockets;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public enum OptionsValues{
     SensitivityVer,
@@ -22,6 +23,8 @@ public enum OptionsValues{
 
 public class Menu : MonoBehaviour
 {
+    private LeaderboardDisplay leaderboardDisplay;
+
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject settingsMenu;
     [SerializeField] private GameObject gameModeMenu;
@@ -45,11 +48,23 @@ public class Menu : MonoBehaviour
     [SerializeField] private TMP_Text senVerText;
     [SerializeField] private TMP_Text senPadText;
 
+    [SerializeField] private Button startButton;
+    [SerializeField] private TMP_Text startText;
+    [SerializeField] private Button[] modeButtons;
+    [SerializeField] private Button[] sizeButtons;
+
+    [SerializeField] private Color selectedColor;
+    [SerializeField] private Color normalColor;
+
+    [SerializeField] private GameObject firstSelected;
+
     private Resolution[] resolutions;
     private List<Resolution> filteredResolutions;
 
     private float currentRefreshRate;
     private int currentResolutionIndex;
+    private bool isModeSelected = false;
+    private bool isSizeSelected = false;
 
     private enum GameSize
     {
@@ -58,6 +73,10 @@ public class Menu : MonoBehaviour
         Game6x6 = 6
     }
     private GameSize gameSize;
+    private void Awake()
+    {
+        leaderboardDisplay = GetComponent<LeaderboardDisplay>();
+    }
 
     private void Start()
     {
@@ -65,18 +84,25 @@ public class Menu : MonoBehaviour
 
         soundsSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeSounds.ToString(), 0); 
         musicSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeMusic.ToString(), 0);
+
         senHorSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
         senVerSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
         senPadSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
+
         qualityDropdown.value = PlayerPrefs.GetInt(OptionsValues.Quality.ToString(), 2); //defoult: High
         screenModeDropdown.value = PlayerPrefs.GetInt(OptionsValues.ScreenMode.ToString(), 1); //defoult: fullscreen Window
 
-        soundsText.text = (80 + soundsSlider.value).ToString("0.");
-        musicText.text = (80 + musicSlider.value).ToString("0.");
+        soundsText.text = (soundsSlider.value * 100).ToString("0.");
+        musicText.text = (musicSlider.value * 100).ToString("0.");
+
         senHorText.text = senHorSlider.value.ToString("0.");
         senVerText.text = senVerSlider.value.ToString("0.");
         senPadText.text = senPadSlider.value.ToString("0.");
 
+    }
+    void OnEnable()
+    {
+        EventSystem.current.SetSelectedGameObject(firstSelected);
     }
 
     public void PlayButton()
@@ -93,6 +119,13 @@ public class Menu : MonoBehaviour
         settingsMenu.SetActive(true);
         SoundManager.PlaySound(SoundType.ClickButton);
     }
+    public void LeaderboardsButton()
+    {
+        mainMenu.SetActive(false);
+        logo.SetActive(false);
+        leaderbordsMenu.SetActive(true);
+        SoundManager.PlaySound(SoundType.ClickButton);
+    }
     public void BackButton()
     {
         mainMenu.SetActive(true);
@@ -100,6 +133,7 @@ public class Menu : MonoBehaviour
         gameModeMenu.SetActive(false);
         settingsMenu.SetActive(false);
         leaderbordsMenu.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(firstSelected);
         SoundManager.PlaySound(SoundType.ClickButton);
     }
     public void GameSizeButton(int size)
@@ -107,21 +141,46 @@ public class Menu : MonoBehaviour
         gameSize = (GameSize)size;
         GridManager.gameWidth = size;
         SoundManager.PlaySound(SoundType.ClickButton);
+
+        isSizeSelected = true;
+        HighlightSelected(sizeButtons);
+        CheckIfReady();
+    }
+    public void LbModeChallButton()
+    {
+        LeaderboardDisplay.displayMode = GameMode.Challange;
+        SoundManager.PlaySound(SoundType.ClickButton);
+        leaderboardDisplay.Refresh();
+    }
+    public void LbModeCasButton()
+    {
+        LeaderboardDisplay.displayMode = GameMode.Casual;
+        SoundManager.PlaySound(SoundType.ClickButton);
+        leaderboardDisplay.Refresh();
     }
     public void StartButton()
     {
-        SceneManager.LoadScene(Enum.GetName(typeof(GameSize),(int)gameSize));
         SoundManager.PlaySound(SoundType.ClickButton);
+        LoadingScreen.sceneToLoad = Enum.GetName(typeof(GameSize), (int)gameSize);
+        SceneManager.LoadScene("Loading");
     }
     public void CasualButton()
     {
         LinePoints.gameMode = GameMode.Casual;
         SoundManager.PlaySound(SoundType.ClickButton);
+
+        isModeSelected = true;
+        HighlightSelected(modeButtons);
+        CheckIfReady();
     }
     public void ChallangeButton()
     {
         LinePoints.gameMode = GameMode.Challange;
         SoundManager.PlaySound(SoundType.ClickButton);
+
+        isModeSelected = true;
+        HighlightSelected(modeButtons);
+        CheckIfReady();
     }
     public void QuitButton()
     {
@@ -131,14 +190,14 @@ public class Menu : MonoBehaviour
 
     public void SetVolumeSounds(float volume)
     {
-        soundsMixer.SetFloat("Volume", volume);
-        soundsText.text = (80 + soundsSlider.value).ToString("0.");
+        soundsMixer.SetFloat("Volume", Mathf.Log10(volume) * 20);
+        soundsText.text = (soundsSlider.value * 100).ToString("0.");
         PlayerPrefs.SetFloat(OptionsValues.VolumeSounds.ToString(), volume);
     }
     public void SetVolumeMusic(float volume)
     {
-        musicMixer.SetFloat("Volume", volume);
-        musicText.text = (80 + musicSlider.value).ToString("0.");
+        musicMixer.SetFloat("Volume", Mathf.Log10(volume) * 20);
+        musicText.text = (musicSlider.value * 100).ToString("0.");
         PlayerPrefs.SetFloat(OptionsValues.VolumeMusic.ToString(), volume);
     }
 
@@ -175,6 +234,39 @@ public class Menu : MonoBehaviour
     {
         senPadText.text = senPadSlider.value.ToString("0.");
         PlayerPrefs.SetFloat(OptionsValues.SensitivityPad.ToString(), Sensitivity);
+    }
+
+    private void HighlightSelected(Button[] buttons)
+    {
+        foreach (Button btn in buttons)
+        {
+            ColorBlock colors = btn.colors;
+            colors.normalColor = normalColor;
+            btn.colors = colors;
+        }
+
+        Button clickedButton = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
+        ColorBlock clickedColors = clickedButton.colors;
+        clickedColors.normalColor = selectedColor;
+        clickedButton.colors = clickedColors;
+    }
+    private void CheckIfReady()
+    {
+        bool ready = (isModeSelected && isSizeSelected);
+        if(ready)
+            ActivateStart();
+    }
+
+    private void ActivateStart()
+    {
+        startButton.interactable = true;
+        Color c = startText.color;
+        c.a = 1f;
+        startText.color = c;
+    }
+    public void SelectBack(GameObject backButton)
+    {
+        EventSystem.current.SetSelectedGameObject(backButton);
     }
 
     private void ResolutionStart()

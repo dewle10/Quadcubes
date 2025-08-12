@@ -8,11 +8,6 @@ public class LogoColors : MonoBehaviour
 
     [SerializeField] private GameObject[] meshes;
 
-    private void Start()
-    {
-        ChangeColors();
-    }
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -35,18 +30,18 @@ public class LogoColors : MonoBehaviour
 
             Color baseColor = (int)Random.Range(0,12) switch
             {
-                0 => HexToColor("#801426"),
+                0 => HexToColor("#B01730"),
                 1 => HexToColor("#32936F"),
-                2 => HexToColor("#F6AE2D"),
-                3 => HexToColor("#33658A"),
-                4 => HexToColor("#F26419"),
-                5 => HexToColor("#9995CF"),
-                6 => HexToColor("#801426"),
+                2 => HexToColor("#EF6F2B"),
+                3 => HexToColor("#3D7BA8"),
+                4 => HexToColor("#F6AE2D"),
+                5 => HexToColor("#938FC6"),
+                6 => HexToColor("#B01730"),
                 7 => HexToColor("#32936F"),
-                8 => HexToColor("#F6AE2D"),
-                9 => HexToColor("#33658A"),
-                10 => HexToColor("#F26419"),
-                11 => HexToColor("#9995CF"),
+                8 => HexToColor("#EF6F2B"),
+                9 => HexToColor("#3D7BA8"),
+                10 => HexToColor("#F6AE2D"),
+                11 => HexToColor("#938FC6"),
                 _ => Color.red
             };
 

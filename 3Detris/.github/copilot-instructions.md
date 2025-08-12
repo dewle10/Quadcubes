@@ -2,7 +2,7 @@
 - Project name: 3Detris
 - Unity version: Unity 6000.1.7f1
 - Active game object:
-  - Name: Game controller
+  - Name: Menu canvas
   - Tag: Untagged
   - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

@@ -66,6 +66,15 @@ MonoBehaviour:
   - {fileID: 8406038888419526565, guid: 4c61d76d4c861a1428da81503de04f49, type: 3}
   - {fileID: 9145124863230188324, guid: fc2ad6d93332b2147b9cb4a38c4576ba, type: 3}
   - {fileID: 1247985539632803139, guid: 3797ebb054ca6434fa25627264f12b37, type: 3}
+  holdShapes:
+  - {fileID: 7962714900129393491, guid: 94be658a1c2b75f49848c70b606112c1, type: 3}
+  - {fileID: 4873267646308836638, guid: 389530d1606adea44bff677d3aa75b22, type: 3}
+  - {fileID: 2390779162021599201, guid: 6c1fa54fc584254438a18c573c968ced, type: 3}
+  - {fileID: 9212577802991843280, guid: d44e2a51f5630234faaa1b01a1fc69fe, type: 3}
+  - {fileID: 7602401780640745070, guid: 3b74f77f1ee7c694b9439887d2192f19, type: 3}
+  - {fileID: 8406038888419526565, guid: 1a9055cab79f8f649a44d54fc1c87ec7, type: 3}
+  - {fileID: 9145124863230188324, guid: dfca028720391794e9f3bca4e34f1d4f, type: 3}
+  - {fileID: 1247985539632803139, guid: 14004f3b68c9ae24cabb6b82e6b57150, type: 3}
   cam: {fileID: 0}
   shapeSpawnPos: {fileID: 0}
   holdShapePos: {fileID: 0}
@@ -115,6 +124,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6917539f0033d5841a72f783e5ec513f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  explosionForce: 5
+  explosionRadius: 15
+  upwardsModifier: 0.7
 --- !u!114 &6448123797912709505
 MonoBehaviour:
   m_ObjectHideFlags: 0

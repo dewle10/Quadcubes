@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1653469875923285772}
   - component: {fileID: 2019455878533200643}
   - component: {fileID: 220059640564569961}
+  - component: {fileID: 6173891169501275515}
   m_Layer: 7
   m_Name: GhostCube
   m_TagString: Untagged
@@ -64,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: eb66a54489e44f84b9a328509deecd23, type: 2}
+  - {fileID: 2100000, guid: 601ed0209b7a49a478003bf567ff22b9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -86,3 +87,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6173891169501275515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8778519417228413517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b03127bbaeb7cd2478ae8b0c22af1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glitchChance: 0.005

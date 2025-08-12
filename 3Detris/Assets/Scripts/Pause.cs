@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class Pause : MonoBehaviour
 {
@@ -8,6 +10,7 @@ public class Pause : MonoBehaviour
     private InputAction pauseAction;
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject settingsMenu;
+    [SerializeField] private GameObject firstSelected;
 
     private void Start()
     {
@@ -38,6 +41,7 @@ public class Pause : MonoBehaviour
     private void GamePause()
     {
         pauseMenu.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(firstSelected);
         Time.timeScale = 0f;
         isPaused = true;
     }
@@ -51,8 +55,10 @@ public class Pause : MonoBehaviour
     public void LoadMenu()
     {
         Time.timeScale = 1f;
-        SoundManager.PlaySound(SoundType.ClickButton);
-        SceneManager.LoadScene(0);
+        isPaused = false;
+        SoundManager.PlaySound(SoundType.ClickButton); 
+        LoadingScreen.sceneToLoad = "Menu";
+        SceneManager.LoadScene("Loading");
     }
     public void BackButton()
     {

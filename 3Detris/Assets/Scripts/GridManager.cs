@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -178,7 +179,7 @@ public class GridManager : MonoBehaviour
         //Debug.Log("loss");
         //SceneManager.LoadScene(0);
 
-        //leaderboard.AddScore("YOU", LinePoints.Score, (BoardSize)gameWidth, LinePoints.gameMode);
+        leaderboard.AddScore("YOU", LinePoints.Score, (BoardSize)gameWidth, LinePoints.gameMode);
     }
     private void Explode()
     {
@@ -197,6 +198,7 @@ public class GridManager : MonoBehaviour
     private IEnumerator DebugResetGame()
     {
         yield return new WaitForSeconds(5f);
-        SceneManager.LoadScene(3);
+        LoadingScreen.sceneToLoad = "Game6x6";
+        SceneManager.LoadScene("Loading");
     }
 }

@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 0.6132076, g: 0.6132076, b: 0.6132076, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.005
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.9316924, g: 0.9339623, b: 0.8943129, a: 1}
@@ -714,6 +714,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 056763b54c8714541a51ec4fc8457e3b, type: 3}
+--- !u!82 &658287144 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 1434056619573510860, guid: 056763b54c8714541a51ec4fc8457e3b, type: 3}
+  m_PrefabInstance: {fileID: 658287143}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -966,6 +971,22 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 330585545}
+    - target: {fileID: 3672378009352229735, guid: 2c07dd832e805f74ca1d1d76f94fb8a2, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 658287144}
+    - target: {fileID: 3672378009352229735, guid: 2c07dd832e805f74ca1d1d76f94fb8a2, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayOneShot
+      objectReference: {fileID: 0}
+    - target: {fileID: 5129314794745811428, guid: 2c07dd832e805f74ca1d1d76f94fb8a2, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 658287144}
+    - target: {fileID: 5129314794745811428, guid: 2c07dd832e805f74ca1d1d76f94fb8a2, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayOneShot
+      objectReference: {fileID: 0}
     - target: {fileID: 6655026139969492283, guid: 2c07dd832e805f74ca1d1d76f94fb8a2, type: 3}
       propertyPath: m_Pivot.x
       value: 0

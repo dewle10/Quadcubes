@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.RenderGraphModule;
 
 public class Falling : MonoBehaviour
 {
@@ -176,6 +177,11 @@ public class Falling : MonoBehaviour
         {
             indicatorPos[i] = new Vector3(1000f, 1000f, 1000f);
             ghostIndicators[i] = Instantiate(ghostIndicator, indicatorPos[i], Quaternion.identity);
+            if (cubes[i].CompareTag("RotateIndicator"))
+            {
+                MeshRenderer renderer = ghostIndicators[i].GetComponent<MeshRenderer>();
+                renderer.material.color = new Color(0.490566f, 0.4666855f, 0.1920612f);
+            }
         }
     }
     private void DestroyGhostCubes()

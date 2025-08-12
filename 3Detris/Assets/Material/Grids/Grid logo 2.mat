@@ -110,6 +110,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _EmissionIntensity: 2
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
@@ -117,7 +118,7 @@ Material:
     - _GridSize: 6
     - _GridSizeX: 8.5
     - _GridSizeY: 3.5
-    - _LineWidth: 0.01
+    - _LineWidth: 0.005
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _OffsetX: -0.045
@@ -139,7 +140,7 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _LineColor: {r: 0.36180198, g: 0.570395, b: 0.602, a: 0.5058824}
+    - _LineColor: {r: 0.31585974, g: 0.6805873, b: 0.735849, a: 0.5058824}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
