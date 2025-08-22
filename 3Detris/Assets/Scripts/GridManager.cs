@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class GridManager : MonoBehaviour
 {
@@ -25,6 +25,9 @@ public class GridManager : MonoBehaviour
     [SerializeField] private float explosionRadius = 100f;
     [SerializeField] private float upwardsModifier = 0.5f;
     private Vector3 explosionPosition;
+
+    [SerializeField] private GameObject gameOverMenu;
+    [SerializeField] private TMP_Text finalScoreText;
 
     private void Awake()
     {
@@ -103,6 +106,8 @@ public class GridManager : MonoBehaviour
                 Transform cube = grid[x, floorNum, z];
                 if (cube != null)
                 {
+                    cube.GetComponentInChildren<ChangeColor>().PlayLCParticle();
+
                     Destroy(cube.gameObject);
                     grid[x, floorNum, z] = null;
                 }
@@ -131,6 +136,8 @@ public class GridManager : MonoBehaviour
     {
         SoundManager.StopMusic();
         SoundManager.PlaySound(SoundType.GameOver);
+        leaderboard.AddScore("YOU", LinePoints.Score, (BoardSize)gameWidth, LinePoints.gameMode);
+
         yield return new WaitForSeconds(0.2f);
         walls.SetActive(false); 
         yield return new WaitForSeconds(0.2f);
@@ -142,6 +149,11 @@ public class GridManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         walls.SetActive(false);
 
+        float waitTime = 0.05f;
+        float changeAfter = 3f;
+        float newWaitTime = 0.03f;
+        float startTime = Time.time;
+
         for (int x = 0; x < gameWidth; x++)
         {
             for (int y = 0; y < gameHeight + 4; y++)
@@ -150,7 +162,11 @@ public class GridManager : MonoBehaviour
                 {
                     if (grid[x, y, z])
                     {
-                        yield return new WaitForSeconds(0.05f);
+                        if (Time.time >= startTime + changeAfter)
+                            waitTime = newWaitTime;
+
+                        yield return new WaitForSeconds(waitTime);
+
                         MeshRenderer renderer = grid[x, y, z].gameObject.GetComponentInChildren<MeshRenderer>();
                         renderer.material.color = Color.red;
                         SoundManager.PlaySound(SoundType.ColorChange);
@@ -175,11 +191,13 @@ public class GridManager : MonoBehaviour
             }
         }
         Explode();
-        StartCoroutine(DebugResetGame());
+        //StartCoroutine(DebugResetGame());
         //Debug.Log("loss");
         //SceneManager.LoadScene(0);
 
-        leaderboard.AddScore("YOU", LinePoints.Score, (BoardSize)gameWidth, LinePoints.gameMode);
+        yield return new WaitForSeconds(3f);
+        gameOverMenu.SetActive(true);
+        finalScoreText.text = LinePoints.Score.ToString();
     }
     private void Explode()
     {
@@ -199,6 +217,13 @@ public class GridManager : MonoBehaviour
     {
         yield return new WaitForSeconds(5f);
         LoadingScreen.sceneToLoad = "Game6x6";
+        SceneManager.LoadScene("Loading");
+    }
+
+    public void Restart()
+    {
+        SoundManager.PlaySound(SoundType.ClickButton);
+        LoadingScreen.sceneToLoad = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene("Loading");
     }
 }

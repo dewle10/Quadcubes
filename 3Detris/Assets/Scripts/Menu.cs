@@ -1,14 +1,14 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Net.Sockets;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.InputSystem;
 
 public enum OptionsValues{
     SensitivityVer,
@@ -18,21 +18,33 @@ public enum OptionsValues{
     VolumeSounds,
     Quality,
     ScreenMode,
-    Resolution
+    Resolution,
+    InvertX,
+    InvertY,
+    VSync,
+    MaxFPS,
+    Gamma,
+
 }
 
 public class Menu : MonoBehaviour
 {
     private LeaderboardDisplay leaderboardDisplay;
+    [SerializeField] private Volume volume;
+    private ColorAdjustments colorAdjustments;
 
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject settingsMenu;
     [SerializeField] private GameObject gameModeMenu;
     [SerializeField] private GameObject leaderbordsMenu;
+    [SerializeField] private GameObject controlsMenu;
     [SerializeField] private GameObject logo;
     [SerializeField] private AudioMixer soundsMixer;
     [SerializeField] private AudioMixer musicMixer;
 
+    [SerializeField] private Toggle invertXToggle;
+    [SerializeField] private Toggle invertYToggle;
+    [SerializeField] private Toggle vSyncToggle;
     [SerializeField] private TMP_Dropdown resolutionDropdown;
     [SerializeField] private TMP_Dropdown qualityDropdown;
     [SerializeField] private TMP_Dropdown screenModeDropdown;
@@ -41,12 +53,16 @@ public class Menu : MonoBehaviour
     [SerializeField] private Slider senHorSlider;
     [SerializeField] private Slider senVerSlider;
     [SerializeField] private Slider senPadSlider;
+    [SerializeField] private Slider gammaSlider;
+    [SerializeField] private Slider maxFpsSlider;
 
     [SerializeField] private TMP_Text soundsText;
     [SerializeField] private TMP_Text musicText;
     [SerializeField] private TMP_Text senHorText;
     [SerializeField] private TMP_Text senVerText;
     [SerializeField] private TMP_Text senPadText;
+    [SerializeField] private TMP_Text gammaText;
+    [SerializeField] private TMP_Text maxFpsText;
 
     [SerializeField] private Button startButton;
     [SerializeField] private TMP_Text startText;
@@ -76,21 +92,32 @@ public class Menu : MonoBehaviour
     private void Awake()
     {
         leaderboardDisplay = GetComponent<LeaderboardDisplay>();
+        volume.profile.TryGet(out colorAdjustments);
     }
 
     private void Start()
     {
         ResolutionStart(); //defoult: hightest Resolution
 
-        soundsSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeSounds.ToString(), 0); 
-        musicSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeMusic.ToString(), 0);
+        soundsSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeSounds.ToString(), 1); 
+        musicSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeMusic.ToString(), 1);
 
         senHorSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
         senVerSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
         senPadSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
 
+        gammaSlider.value = PlayerPrefs.GetFloat(OptionsValues.Gamma.ToString(), 0);
+        maxFpsSlider.value = PlayerPrefs.GetFloat(OptionsValues.MaxFPS.ToString(), 60);
+
         qualityDropdown.value = PlayerPrefs.GetInt(OptionsValues.Quality.ToString(), 2); //defoult: High
         screenModeDropdown.value = PlayerPrefs.GetInt(OptionsValues.ScreenMode.ToString(), 1); //defoult: fullscreen Window
+
+        int VSyncint = PlayerPrefs.GetInt(OptionsValues.VSync.ToString(), 0); //defoult: off
+        int invertXint = PlayerPrefs.GetInt(OptionsValues.InvertX.ToString(), 0); //defoult: off
+        int invertYint = PlayerPrefs.GetInt(OptionsValues.InvertY.ToString(), 0); //defoult: off
+        vSyncToggle.isOn = VSyncint == 1;
+        invertXToggle.isOn = invertXint == 1;
+        invertYToggle.isOn = invertYint == 1;
 
         soundsText.text = (soundsSlider.value * 100).ToString("0.");
         musicText.text = (musicSlider.value * 100).ToString("0.");
@@ -98,6 +125,9 @@ public class Menu : MonoBehaviour
         senHorText.text = senHorSlider.value.ToString("0.");
         senVerText.text = senVerSlider.value.ToString("0.");
         senPadText.text = senPadSlider.value.ToString("0.");
+
+        gammaText.text = gammaSlider.value.ToString("0.#");
+        maxFpsText.text = maxFpsSlider.value.ToString("0.");
 
     }
     void OnEnable()
@@ -124,6 +154,13 @@ public class Menu : MonoBehaviour
         mainMenu.SetActive(false);
         logo.SetActive(false);
         leaderbordsMenu.SetActive(true);
+        leaderboardDisplay.Refresh();
+        SoundManager.PlaySound(SoundType.ClickButton);
+    }
+    public void ControlsButton()
+    {
+        settingsMenu.SetActive(false);
+        controlsMenu.SetActive(true);
         SoundManager.PlaySound(SoundType.ClickButton);
     }
     public void BackButton()
@@ -134,6 +171,12 @@ public class Menu : MonoBehaviour
         settingsMenu.SetActive(false);
         leaderbordsMenu.SetActive(false);
         EventSystem.current.SetSelectedGameObject(firstSelected);
+        SoundManager.PlaySound(SoundType.ClickButton);
+    }
+    public void BackButtonControls()
+    {
+        settingsMenu.SetActive(true);
+        controlsMenu.SetActive(false);
         SoundManager.PlaySound(SoundType.ClickButton);
     }
     public void GameSizeButton(int size)
@@ -199,6 +242,32 @@ public class Menu : MonoBehaviour
         musicMixer.SetFloat("Volume", Mathf.Log10(volume) * 20);
         musicText.text = (musicSlider.value * 100).ToString("0.");
         PlayerPrefs.SetFloat(OptionsValues.VolumeMusic.ToString(), volume);
+    }
+    public void SetGamma(float value)
+    {
+        colorAdjustments.postExposure.Override(value);
+        gammaText.text = gammaSlider.value.ToString("0.#");
+        PlayerPrefs.SetFloat(OptionsValues.Gamma.ToString(), value);
+    }
+    public void SetMaxFPS(float value)
+    {
+        Application.targetFrameRate = Mathf.RoundToInt(value);
+        maxFpsText.text = maxFpsSlider.value.ToString("0.");
+        PlayerPrefs.SetFloat(OptionsValues.MaxFPS.ToString(), value);
+    }
+    public void SetVsync(bool IsOn)
+    {
+        int value = IsOn ? 1 : 0;
+        QualitySettings.vSyncCount = value;
+        PlayerPrefs.SetInt(OptionsValues.VSync.ToString(), value);
+    }
+    public void SetInvertX(bool value)
+    {
+        PlayerPrefs.SetInt(OptionsValues.InvertX.ToString(), value ? 1 : 0);
+    }
+    public void SetInvertY(bool value)
+    {
+        PlayerPrefs.SetInt(OptionsValues.InvertY.ToString(), value ? 1 : 0);
     }
 
     public void SetQuality(int qualityIndex)

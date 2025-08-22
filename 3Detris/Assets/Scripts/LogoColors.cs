@@ -7,6 +7,7 @@ public class LogoColors : MonoBehaviour
     //readonly private static float innerBrightness = 0.6f;
 
     [SerializeField] private GameObject[] meshes;
+    public Color color;
 
     private void Update()
     {
@@ -28,42 +29,22 @@ public class LogoColors : MonoBehaviour
             int y = (int)pos.y;
             int z = (int)pos.z;
 
-            Color baseColor = (int)Random.Range(0,12) switch
+            Color baseColor = (int)Random.Range(0, 12) switch
             {
-                0 => HexToColor("#B01730"),
-                1 => HexToColor("#32936F"),
-                2 => HexToColor("#EF6F2B"),
-                3 => HexToColor("#3D7BA8"),
-                4 => HexToColor("#F6AE2D"),
-                5 => HexToColor("#938FC6"),
-                6 => HexToColor("#B01730"),
-                7 => HexToColor("#32936F"),
-                8 => HexToColor("#EF6F2B"),
-                9 => HexToColor("#3D7BA8"),
-                10 => HexToColor("#F6AE2D"),
-                11 => HexToColor("#938FC6"),
+                0 => HexToColor("#DD2C4B"),
+                1 => HexToColor("#45B88E"),
+                2 => HexToColor("#FF7A34"),
+                3 => HexToColor("#588FD2"),
+                4 => HexToColor("#FFC93C"),
+                5 => HexToColor("#D588F2"),
+                6 => HexToColor("#DD2C4B"),
+                7 => HexToColor("#45B88E"),
+                8 => HexToColor("#FF7A34"),
+                9 => HexToColor("#588FD2"),
+                10 => HexToColor("#FFC93C"),
+                11 => HexToColor("#D588F2"),
                 _ => Color.red
             };
-
-            //float brightness;
-
-            //if (x == 0 || x == 5 || z == 0 || z == 5) //outer
-            //{
-            //    brightness = outerBrightness;
-            //}
-            //else if ((x >= 2 && x <= 3) && (z >= 2 && z <= 3)) //inner
-            //{
-            //    brightness = innerBrightness;
-            //}
-            //else //middle
-            //{
-            //    brightness = middleBrightness;
-            //}
-
-            //Color finalColor = baseColor * brightness;
-            //finalColor.a = 1f;
-
-            //renderer.material.color = finalColor;
             renderer.material.color = baseColor;
         }
 

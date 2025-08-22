@@ -12,13 +12,9 @@ public class LeaderboardDisplay : MonoBehaviour
     public static GameMode displayMode = GameMode.Challange;
     [SerializeField] private TMP_FontAsset font;
 
-    private void OnEnable()
-    {
-        Refresh();
-    }
-
     public void Refresh()
     {
+        SoundManager.PlaySound(SoundType.ClickButton);
         foreach (Transform t in content) Destroy(t.gameObject);
 
         List<ScoreEntry> scores = Leaderboard.LoadLeaderboard().scores;

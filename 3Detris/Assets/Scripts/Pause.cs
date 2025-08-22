@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class Pause : MonoBehaviour
 {
@@ -11,10 +13,14 @@ public class Pause : MonoBehaviour
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject settingsMenu;
     [SerializeField] private GameObject firstSelected;
+    private ColorAdjustments colorAdjustments;
 
     private void Start()
     {
         pauseAction = InputSystem.actions.FindAction("Pause");
+        Volume volume = FindFirstObjectByType<Volume>();
+        volume.profile.TryGet(out colorAdjustments);
+        colorAdjustments.postExposure.Override(PlayerPrefs.GetFloat(OptionsValues.Gamma.ToString(), 0));
     }
 
     private void Update()

@@ -87,7 +87,7 @@ public class LinePoints : MonoBehaviour
 		linesToLevelupCount += clearedLinesDrop;
 		if (gameMode == GameMode.Challange && linesToLevelupCount - linesToLevelup >= 0)
         {
-            level += 0.5f;
+            level += 1f;
 			levelText.text = level.ToString();
             linesToLevelupCount -= linesToLevelup;
 		}

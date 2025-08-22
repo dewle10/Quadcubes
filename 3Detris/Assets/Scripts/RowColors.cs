@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Reflection;
 using UnityEngine;
 
@@ -5,12 +6,13 @@ public class RowColors : MonoBehaviour
 {
     readonly private static float outerBrightness = 1f;
     readonly private static float middleBrightness = 0.8f;
-    readonly private static float innerBrightness = 0.6f;
+    readonly private static float innerBrightness = 0.7f;
 
     public static void ChangeColor(GameObject cube)
     {
         Vector3 pos = cube.transform.position;
         MeshRenderer renderer = cube.GetComponentInChildren<MeshRenderer>();
+        ChangeColor changeColor = cube.GetComponentInChildren<ChangeColor>();
 
         if (renderer == null) return;
 
@@ -20,37 +22,20 @@ public class RowColors : MonoBehaviour
 
         Color baseColor = y switch
         {
-            0 => HexToColor("#B01730"),
-            1 => HexToColor("#32936F"),
-            2 => HexToColor("#EF6F2B"),
-            3 => HexToColor("#3D7BA8"),
-            4 => HexToColor("#F6AE2D"),
-            5 => HexToColor("#938FC6"),
-            6 => HexToColor("#B01730"),
-            7 => HexToColor("#32936F"),
-            8 => HexToColor("#EF6F2B"),
-            9 => HexToColor("#3D7BA8"),
-            10 => HexToColor("#F6AE2D"),
-            11 => HexToColor("#938FC6"),
+            0 => HexToColor("#DD2C4B"),
+            1 => HexToColor("#45B88E"),
+            2 => HexToColor("#FF7A34"),
+            3 => HexToColor("#588FD2"),
+            4 => HexToColor("#FFC93C"),
+            5 => HexToColor("#D588F2"),
+            6 => HexToColor("#DD2C4B"),
+            7 => HexToColor("#45B88E"),
+            8 => HexToColor("#FF7A34"),
+            9 => HexToColor("#588FD2"),
+            10 => HexToColor("#FFC93C"),
+            11 => HexToColor("#D588F2"),
             _ => Color.red
         };
-
-        //Color baseColor = y switch
-        //{
-        //    0 => HexToColor("#801426"),
-        //    1 => HexToColor("#7BB22E"),
-        //    2 => HexToColor("#587B7F"),
-        //    3 => HexToColor("#FED766"),
-        //    4 => HexToColor("#7A8450"),
-        //    5 => HexToColor("#9188CF"),
-        //    6 => HexToColor("#801426"),
-        //    7 => HexToColor("#7BB22E"),
-        //    8 => HexToColor("#587B7F"),
-        //    9 => HexToColor("#FED766"),
-        //    10 => HexToColor("#7A8450"),
-        //    11 => HexToColor("#9188CF"),
-        //    _ => Color.red
-        //};
 
         float brightness;
 
@@ -73,10 +58,10 @@ public class RowColors : MonoBehaviour
             brightness = middleBrightness;
         }
 
-        Color finalColor = baseColor * brightness;
-        finalColor.a = 1f;
+        Color newColor = baseColor * brightness;
+        newColor.a = 1f;
 
-        renderer.material.color = finalColor;
+        changeColor.StartCoroutine(changeColor.Change(newColor));
     }
     private static Color HexToColor(string hex)
     {

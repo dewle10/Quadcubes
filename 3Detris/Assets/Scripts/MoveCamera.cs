@@ -22,6 +22,9 @@ public class MoveCamera : MonoBehaviour
     [Header("Start")]
     [SerializeField] private float startAngleX;
     [SerializeField] private float startAngleY;
+    [Header("Invert")]
+    [SerializeField] private bool invertX;
+    [SerializeField] private bool invertY;     
     //Inputs
     private PlayerInput playerInput;
     private InputAction lookAction, zoomAction;
@@ -60,6 +63,9 @@ public class MoveCamera : MonoBehaviour
         horizontalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
         verticalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
         padLookSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
+
+        invertX = PlayerPrefs.GetInt(OptionsValues.InvertX.ToString(), 0) == 1;
+        invertY = PlayerPrefs.GetInt(OptionsValues.InvertY.ToString(), 0) == 1;
     }
     private void OnEnable()
     {
@@ -93,8 +99,12 @@ public class MoveCamera : MonoBehaviour
             {
                 delta *= padLookSpeed;
             }
-            targetAngleY += delta.x * horizontalSpeed * Time.deltaTime;
-            targetAngleX = Mathf.Clamp(targetAngleX + delta.y * verticalSpeed * Time.deltaTime, minAngleX, maxAngleX);
+
+            float invertXValue = invertX ? -1f : 1f;
+            float invertYValue = invertY ? -1f : 1f;
+
+            targetAngleY += delta.x * horizontalSpeed * Time.deltaTime * invertXValue;
+            targetAngleX = Mathf.Clamp(targetAngleX + delta.y * verticalSpeed * Time.deltaTime * invertYValue, minAngleX, maxAngleX);
         }
 
         //SmoothDamp to targets

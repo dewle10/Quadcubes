@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Rendering.RenderGraphModule;
 
 public class Falling : MonoBehaviour
 {
@@ -24,6 +23,8 @@ public class Falling : MonoBehaviour
 
     [SerializeField] private GameObject lights;
 
+    private Transform gameArena;
+
     public bool _Debug_IsLine;
 
     private void Awake()
@@ -34,6 +35,7 @@ public class Falling : MonoBehaviour
     {
         shapeDispenser = FindFirstObjectByType<ShapeDispenser>();
         linePoints = FindFirstObjectByType<LinePoints>();
+        gameArena = FindFirstObjectByType<SceneShake>().transform;
         if (!_Debug_IsLine)
             GhostIndicatorArrays();
         fallingSpeed = linePoints.GetFallingSpeed();
@@ -83,6 +85,8 @@ public class Falling : MonoBehaviour
         transform.position += Vector3.down * distance;
         fallenBlocksPoints += (int)distance*2; //droped blocks x2 points
         MakeSolid();
+
+        SceneShake.Shake();
     }
     private void GroundCheck()
     {
@@ -114,11 +118,13 @@ public class Falling : MonoBehaviour
             cube.layer = 6; //solid
             GridManager.AddToGrid(cube.transform);
             RowColors.ChangeColor(cube);
+            cube.GetComponentInChildren<ChangeColor>().PlayPlaceParticle();
         }
         fallingTimercounter = 0;
         DestroyGhostCubes();
         linePoints.GetFallingSpeed();
         shapeDispenser.ResetHold();
+        transform.SetParent(gameArena, true);
 
         if (!_Debug_IsLine)
         {

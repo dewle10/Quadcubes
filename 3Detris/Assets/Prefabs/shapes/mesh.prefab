@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3302615898801149570}
   - component: {fileID: 7570965422638935724}
   - component: {fileID: 7711566190968068851}
+  - component: {fileID: 7912498694116717392}
   m_Layer: 7
   m_Name: mesh
   m_TagString: Untagged
@@ -86,3 +87,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7912498694116717392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3960172832186377226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a069c30632b234d8c87cd5d92bd029, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  placeParticle: {fileID: 4689340022723843924, guid: 37c0f4b51173dab4eb8fcd513ce5418a, type: 3}
+  lineClearParticle: {fileID: 4689340022723843924, guid: 48b67c77739483c45a234b36886d24b6, type: 3}
+  colorChangeTime: 1
+  colorChangeRate: 0.8
+  colorChangeStart: 0.5
