@@ -29,19 +29,19 @@ public class LogoColors : MonoBehaviour
             int y = (int)pos.y;
             int z = (int)pos.z;
 
-            Color baseColor = (int)Random.Range(0, 12) switch
+            Color baseColor = Random.Range(0, 12) switch
             {
-                0 => HexToColor("#DD2C4B"),
-                1 => HexToColor("#45B88E"),
+                0 => HexToColor("#FF3945"),
+                1 => HexToColor("#24BE5F"),
                 2 => HexToColor("#FF7A34"),
-                3 => HexToColor("#588FD2"),
-                4 => HexToColor("#FFC93C"),
+                3 => HexToColor("#479AFF"),
+                4 => HexToColor("#FFDD19"),
                 5 => HexToColor("#D588F2"),
-                6 => HexToColor("#DD2C4B"),
-                7 => HexToColor("#45B88E"),
+                6 => HexToColor("#FF3945"),
+                7 => HexToColor("#24BE5F"),
                 8 => HexToColor("#FF7A34"),
-                9 => HexToColor("#588FD2"),
-                10 => HexToColor("#FFC93C"),
+                9 => HexToColor("#479AFF"),
+                10 => HexToColor("#FFDD19"),
                 11 => HexToColor("#D588F2"),
                 _ => Color.red
             };

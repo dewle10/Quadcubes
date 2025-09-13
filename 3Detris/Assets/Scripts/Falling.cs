@@ -12,7 +12,7 @@ public class Falling : MonoBehaviour
     [SerializeField] private int fallenBlocksPoints; 
 
     public GameObject[] cubes;
-    LayerMask layerMask;
+    private LayerMask layerMask;
 
     [SerializeField] private ShapeDispenser shapeDispenser;
     [SerializeField] private LinePoints linePoints;
@@ -96,15 +96,10 @@ public class Falling : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(obj.transform.position, Vector3.down, out hit, rayDistance, layerMask))
             {
-                Debug.DrawRay(obj.transform.position, Vector3.down * hit.distance, Color.yellow);
+                //Debug.DrawRay(obj.transform.position, Vector3.down * hit.distance, Color.yellow);
                 //Debug.Log("Did Hit");
                 aboveSolid = true;
                 break;
-            }
-            else
-            {
-                Debug.DrawRay(obj.transform.position, Vector3.down * rayDistance, Color.white);
-                //Debug.Log("Did not Hit");
             }
         }
     }

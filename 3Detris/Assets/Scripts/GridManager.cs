@@ -28,10 +28,12 @@ public class GridManager : MonoBehaviour
 
     [SerializeField] private GameObject gameOverMenu;
     [SerializeField] private TMP_Text finalScoreText;
+    [SerializeField] private bool isDemo;
 
     private void Awake()
     {
         instance = this;
+        if (isDemo) gameWidth = 5;
     }
 
     private void Start()
@@ -154,9 +156,9 @@ public class GridManager : MonoBehaviour
         float newWaitTime = 0.03f;
         float startTime = Time.time;
 
-        for (int x = 0; x < gameWidth; x++)
+        for (int y = 0; y < gameHeight + 4; y++)
         {
-            for (int y = 0; y < gameHeight + 4; y++)
+            for (int x = 0; x < gameWidth; x++)
             {
                 for (int z = 0; z < gameWidth; z++)
                 {
@@ -196,6 +198,9 @@ public class GridManager : MonoBehaviour
         //SceneManager.LoadScene(0);
 
         yield return new WaitForSeconds(3f);
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         gameOverMenu.SetActive(true);
         finalScoreText.text = LinePoints.Score.ToString();
     }
@@ -223,6 +228,7 @@ public class GridManager : MonoBehaviour
     public void Restart()
     {
         SoundManager.PlaySound(SoundType.ClickButton);
+        gameOver = false;
         LoadingScreen.sceneToLoad = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene("Loading");
     }

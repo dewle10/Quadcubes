@@ -37,6 +37,8 @@ public class LinePoints : MonoBehaviour
 	void Start()
     {
         maxFloorObjNum = GridManager.gameWidth * GridManager.gameWidth;
+        points = 0;
+        UpdatePoints();
     }
 
     public void AddDropPoints(int fallenBlocks)
@@ -109,7 +111,7 @@ public class LinePoints : MonoBehaviour
     }
     public float GetFallingSpeed()
     {
-        return level;
+        return level * 2;
     }
     //private void OnDrawGizmos()
     //{

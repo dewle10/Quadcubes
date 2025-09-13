@@ -404,10 +404,9 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
 
             foreach (InputBinding binding in action.actionMap.bindings)
             {
-                currentIndex++;
-
                 if (binding.action == newBinding.action)
                 {
+                    currentIndex++;
                     if (binding.isPartOfComposite && currentIndex != bindingIndex)
                     {
                         if (binding.effectivePath == newBinding.effectivePath)
@@ -416,7 +415,6 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                             return true;
                         }
                     }
-
                     else
                     {
                         continue;

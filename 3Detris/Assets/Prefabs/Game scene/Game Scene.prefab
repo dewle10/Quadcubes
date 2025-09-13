@@ -581,7 +581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 0.2
-  magnitude: 0.15
+  magnitude: 0.18
   strengthXZ: 0.015
 --- !u!1 &2192363407389166613
 GameObject:

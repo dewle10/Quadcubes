@@ -82,6 +82,7 @@ MonoBehaviour:
   verticalSpeed: 10
   zoomSpeed: 90
   padLookSpeed: 10
+  zoomStep: 2
   minAngleX: -89
   maxAngleX: 89
   minDistance: 2
@@ -90,6 +91,8 @@ MonoBehaviour:
   zoomSmoothTime: 0.2
   startAngleX: 30
   startAngleY: 35
+  invertX: 0
+  invertY: 0
 --- !u!114 &3799615325208864807
 MonoBehaviour:
   m_ObjectHideFlags: 0

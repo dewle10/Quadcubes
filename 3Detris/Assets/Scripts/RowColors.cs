@@ -5,8 +5,8 @@ using UnityEngine;
 public class RowColors : MonoBehaviour
 {
     readonly private static float outerBrightness = 1f;
-    readonly private static float middleBrightness = 0.8f;
-    readonly private static float innerBrightness = 0.7f;
+    readonly private static float middleBrightness = 0.9f;
+    readonly private static float innerBrightness = 0.8f;
 
     public static void ChangeColor(GameObject cube)
     {
@@ -22,17 +22,17 @@ public class RowColors : MonoBehaviour
 
         Color baseColor = y switch
         {
-            0 => HexToColor("#DD2C4B"),
-            1 => HexToColor("#45B88E"),
+            0 => HexToColor("#FF3945"),
+            1 => HexToColor("#2AE371"),
             2 => HexToColor("#FF7A34"),
-            3 => HexToColor("#588FD2"),
-            4 => HexToColor("#FFC93C"),
+            3 => HexToColor("#479AFF"),
+            4 => HexToColor("#FFDD19"),
             5 => HexToColor("#D588F2"),
-            6 => HexToColor("#DD2C4B"),
-            7 => HexToColor("#45B88E"),
+            6 => HexToColor("#FF3945"),
+            7 => HexToColor("#2AE371"),
             8 => HexToColor("#FF7A34"),
-            9 => HexToColor("#588FD2"),
-            10 => HexToColor("#FFC93C"),
+            9 => HexToColor("#479AFF"),
+            10 => HexToColor("#FFDD19"),
             11 => HexToColor("#D588F2"),
             _ => Color.red
         };

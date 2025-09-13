@@ -49,7 +49,6 @@ public class ControlsRebind : MonoBehaviour
                 actionToRebind.action.Enable();
                 operation.Dispose();
 
-                // od razu zapis po zmianie
                 SaveRebinds();
             })
             .Start();

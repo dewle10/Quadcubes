@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,12 +23,14 @@ public class MoveCamera : MonoBehaviour
     [Header("Start")]
     [SerializeField] private float startAngleX;
     [SerializeField] private float startAngleY;
+    private bool isStartPause;
     [Header("Invert")]
     [SerializeField] private bool invertX;
-    [SerializeField] private bool invertY;     
+    [SerializeField] private bool invertY;
     //Inputs
     private PlayerInput playerInput;
     private InputAction lookAction, zoomAction;
+    private InputAction lookLRAction, lookDUAction, zoomInOutAction;
     private bool usingPad;
     //Targets
     private float targetAngleX, targetAngleY, targetDistance;
@@ -38,11 +41,13 @@ public class MoveCamera : MonoBehaviour
 
     private void Awake()
     {
-        lookAction = InputSystem.actions.FindAction("Look");
-        zoomAction = InputSystem.actions.FindAction("Zoom");
         playerInput = gameObject.GetComponent<PlayerInput>();
+        lookAction = playerInput.actions["Look"];
+        zoomAction = playerInput.actions["ZoomScroll"];
+        lookLRAction = playerInput.actions["Look Horizontal"];
+        lookDUAction = playerInput.actions["Look Vertical"];
+        zoomInOutAction = playerInput.actions["Zoom"];
     }
-
     private void Start()
     {
         targetDistance = Vector3.Distance(pivotPoint.position, cam.transform.position);
@@ -59,24 +64,26 @@ public class MoveCamera : MonoBehaviour
         cam.transform.position = pivotPoint.position + startOffset;
         cam.transform.LookAt(pivotPoint.position);
 
-        
-        horizontalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
-        verticalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
-        padLookSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
+        SetSettingsValues();
 
-        invertX = PlayerPrefs.GetInt(OptionsValues.InvertX.ToString(), 0) == 1;
-        invertY = PlayerPrefs.GetInt(OptionsValues.InvertY.ToString(), 0) == 1;
+        StartCoroutine(StartPasue());
     }
     private void OnEnable()
     {
         lookAction.Enable();
         zoomAction.Enable();
+        lookLRAction.Enable();
+        lookDUAction.Enable();
+        zoomInOutAction.Enable();
         playerInput.onControlsChanged += OnControlsChanged;
     }
     private void OnDisable()
     {
         lookAction.Disable();
         zoomAction.Disable();
+        lookLRAction.Disable();
+        lookDUAction.Disable();
+        zoomInOutAction.Disable();
         playerInput.onControlsChanged -= OnControlsChanged;
     }
     private void Update()
@@ -91,11 +98,15 @@ public class MoveCamera : MonoBehaviour
             targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
         }
 
+        float zoomDir = zoomInOutAction.ReadValue<float>();
+        if (zoomInOutAction.IsPressed())
+            targetDistance = Mathf.Clamp(targetDistance + zoomSpeed * zoomDir * Time.deltaTime * 0.2f, minDistance, maxDistance);
+
         //Rotation target
-        if (lookAction.IsPressed())
+        if (!isStartPause)
         {
             Vector2 delta = lookAction.ReadValue<Vector2>();
-            if (usingPad) 
+            if (usingPad)
             {
                 delta *= padLookSpeed;
             }
@@ -105,6 +116,17 @@ public class MoveCamera : MonoBehaviour
 
             targetAngleY += delta.x * horizontalSpeed * Time.deltaTime * invertXValue;
             targetAngleX = Mathf.Clamp(targetAngleX + delta.y * verticalSpeed * Time.deltaTime * invertYValue, minAngleX, maxAngleX);
+        }
+        //Rotation On Buttons
+        float lookLRDir = lookLRAction.ReadValue<float>();
+        if (lookLRAction.triggered)
+        {
+            targetAngleY += 90f * lookLRDir;
+        }
+        float lookDUDir = lookDUAction.ReadValue<float>();
+        if (lookDUAction.triggered)
+        {
+            targetAngleX = Mathf.Clamp(targetAngleX + 30f * lookDUDir, minAngleX, maxAngleX);
         }
 
         //SmoothDamp to targets
@@ -122,9 +144,26 @@ public class MoveCamera : MonoBehaviour
         cam.transform.LookAt(pivotPoint.position);
     }
 
-    void OnControlsChanged(PlayerInput input)
+    private void OnControlsChanged(PlayerInput input)
     {
         string scheme = input.currentControlScheme;
         usingPad = scheme == "Gamepad";
     }
+    public void SetSettingsValues()
+    {
+        horizontalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
+        verticalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
+        padLookSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
+        zoomSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityZoom.ToString(), 90);
+
+        invertX = PlayerPrefs.GetInt(OptionsValues.InvertX.ToString(), 0) == 1;
+        invertY = PlayerPrefs.GetInt(OptionsValues.InvertY.ToString(), 0) == 1;
+    }
+    private IEnumerator StartPasue()
+    {
+        isStartPause = true;
+        yield return new WaitForSeconds(1f);
+        isStartPause = false;
+    }
 }
+

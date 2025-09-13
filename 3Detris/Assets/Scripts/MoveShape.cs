@@ -18,7 +18,7 @@ public class MoveShape : MonoBehaviour
     private bool rotateXNow;
     private bool rotateYNow;
     private bool rotateZNow;
-    
+
     [SerializeField] private float dasTime = 0.2f;  //Delayed Auto Shift DAS
     private float dasCounter;
     [SerializeField] private float arrTime = 0.05f; //repeatRate ARR
@@ -36,7 +36,7 @@ public class MoveShape : MonoBehaviour
     private GameObject currentShape;
     private CameraTracker cameraTracker;
     private LinePoints linePoints;
-    [SerializeField]private int sector;
+    [SerializeField] private int sector;
 
     //Detection
     private Transform currentGhost;
@@ -53,10 +53,10 @@ public class MoveShape : MonoBehaviour
     private void Awake()
     {
         moveAction = InputSystem.actions.FindAction("Move");
-        moveDownAction = InputSystem.actions.FindAction("MoveDown");
-        rotateActionX = InputSystem.actions.FindAction("RotateX");
-        rotateActionY = InputSystem.actions.FindAction("RotateY");
-        rotateActionZ = InputSystem.actions.FindAction("RotateZ");
+        moveDownAction = InputSystem.actions.FindAction("Move Down");
+        rotateActionX = InputSystem.actions.FindAction("Rotate X");
+        rotateActionY = InputSystem.actions.FindAction("Rotate Y");
+        rotateActionZ = InputSystem.actions.FindAction("Rotate Z");
         DropAction = InputSystem.actions.FindAction("Drop");
         walls = FindObjectsByType<WallKicks>(FindObjectsSortMode.None);
         cameraTracker = FindFirstObjectByType<CameraTracker>();
@@ -165,13 +165,13 @@ public class MoveShape : MonoBehaviour
                 break;
             }
         }
-        if (wallKick) 
+        if (wallKick)
         {
             //Debug.Log(wallKickDirection);
             directionVector = wallKickDirection;
             TryMove();
         }
-        if(!canMove && wallKick)
+        if (!canMove && wallKick)
         {
             FailedRotationIndicator();
             canRotate = false;
