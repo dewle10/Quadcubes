@@ -1,6 +1,6 @@
-[ss]
+![Quadcubes Logo](3Detris/Assets/Recordings/Quadcubes_store_capsule_header.png)
+
 Quadcubes is a minimalist puzzle game where you move, rotate, and stack falling blocks across all three axes to fill and clear layers to score points.
-[ss]
 
 Features:
 
@@ -14,3 +14,6 @@ Features:
 Play the Demo on: https://dewle.itch.io/quadcubes.
 
 Made in Unity 6000.1.71f.
+
+![Quadcubes Sizes](3Detris/Assets/Recordings/Quadcubes_Description_Screenshots.png)
+![Quadcubes Gameplay](3Detris/Assets/Recordings/Quadcubes_Gameplay.png)
