@@ -5,13 +5,10 @@ public class CameraTracker : MonoBehaviour
     public Transform Center;
     public Transform cam;
 
-    public enum Sector
-    {
-        Front = 0,
-        Right = 1,
-        Back = 2,
-        Left = 3
-    }
+    //Front = 0,
+    //Right = 1,
+    //Back = 2,
+    //Left = 3
     public int GetCameraSector()
     {
         Vector3 dir = cam.position - Center.position;
@@ -22,9 +19,5 @@ public class CameraTracker : MonoBehaviour
 
         int index = Mathf.FloorToInt((angle + 45f) / 90f) % 4;
         return index;
-    }
-
-    private void Start()
-    {
     }
 }

@@ -3,21 +3,27 @@ using UnityEngine.InputSystem;
 
 public class ShapeDispenser : MonoBehaviour
 {
+    [Header("Prefabs")]
     public GameObject[] shapes;
     public GameObject[] displayShapes;
     public GameObject[] holdShapes;
-    private MoveShape playerController;
-    private GameObject currentShape;
-    private GameObject holdShape;
-    private GameObject nextShape;
-    private int currentShapenum;
-    private int nextShapenum = -1;
-    private int previousShapenum = -1;
-    private int holdShapenum = -1;
+
+    [Header("References")]
     [SerializeField] private GameObject cam;
     [SerializeField] private Transform shapeSpawnPos;
     [SerializeField] private Transform holdShapePos;
     [SerializeField] private Transform nextShapePos;
+
+    private MoveShape playerController;
+
+    private GameObject currentShape;
+    private GameObject holdShape;
+    private GameObject nextShape;
+
+    private int currentShapeIndex;
+    private int nextShapeIndex = -1;
+    private int previousShapeIndex = -1;
+    private int holdShapeIndex = -1;
 
     private InputAction holdAction;
     private bool holding;
@@ -29,21 +35,29 @@ public class ShapeDispenser : MonoBehaviour
     }
     private void Start()
     {
-        nextShapenum = RandomShapeNum();
+        nextShapeIndex = RandomShapeIndex();
         SpawnShape(false);
+    }
+    private void OnEnable()
+    {
+        holdAction.Enable();
+    }
+    private void OnDisable()
+    {
+        holdAction.Disable();
     }
     private void Update()
     {
         HoldShape();
     }
-    public int RandomShapeNum()
+    public int RandomShapeIndex()
     {
-        int num = Random.Range(0, shapes.Length); 
-        while (num == previousShapenum && previousShapenum == currentShapenum)
+        int Index = Random.Range(0, shapes.Length); 
+        while (Index == previousShapeIndex && previousShapeIndex == currentShapeIndex)
         {
-            num = Random.Range(0, shapes.Length);
+            Index = Random.Range(0, shapes.Length);
         }
-        return num;
+        return Index;
     }
     public void SpawnShape(bool isHoldShape)
     {
@@ -52,47 +66,43 @@ public class ShapeDispenser : MonoBehaviour
         {
             if (!isHoldShape)
             {
-                previousShapenum = currentShapenum;
-                currentShapenum = nextShapenum;
-                nextShapenum = RandomShapeNum();
+                previousShapeIndex = currentShapeIndex;
+                currentShapeIndex = nextShapeIndex;
+                nextShapeIndex = RandomShapeIndex();
 
                 if(nextShape != null)
                     Destroy(nextShape);
-                nextShape = Instantiate(displayShapes[nextShapenum], cam.transform);
+                nextShape = Instantiate(displayShapes[nextShapeIndex], cam.transform);
                 nextShape.transform.position = nextShapePos.position;
             }
             else
             {
                 Destroy(holdShape);
-                (currentShapenum, holdShapenum) = (holdShapenum, currentShapenum);
-                holdShape = Instantiate(holdShapes[holdShapenum], cam.transform);
+                (currentShapeIndex, holdShapeIndex) = (holdShapeIndex, currentShapeIndex);
+                holdShape = Instantiate(holdShapes[holdShapeIndex], cam.transform);
                 holdShape.transform.position = holdShapePos.position;
 
             }
-            MakeShape();
+            currentShape = Instantiate(shapes[currentShapeIndex], shapeSpawnPos.position, Quaternion.identity);
+            playerController.ChangeCurrentShape(currentShape);
         }
-    }
-    private void MakeShape()
-    {
-        currentShape = Instantiate(shapes[currentShapenum], shapeSpawnPos.position, Quaternion.identity);
-        playerController.ChangeCurrentShape(currentShape);
     }
     private void HoldShape()
     {
-        if (holdAction.WasPressedThisFrame() && !GridManager.gameOver && !Pause.isPaused)
+        if (holdAction.WasPressedThisFrame() && !GridManager.gameOver && !Pause.IsPaused)
         {
             if (!holding)
             {
                 holding = true;
                 currentShape.GetComponent<Falling>().DestroyShape();
-                if (holdShapenum >= 0) 
+                if (holdShapeIndex >= 0) 
                 {
                     SpawnShape(true);
                 }
                 else //first time
                 {
-                    holdShapenum = currentShapenum;
-                    holdShape = Instantiate(holdShapes[holdShapenum], cam.transform);
+                    holdShapeIndex = currentShapeIndex;
+                    holdShape = Instantiate(holdShapes[holdShapeIndex], cam.transform);
                     holdShape.transform.position = holdShapePos.position;
                     SpawnShape(false);
                 }

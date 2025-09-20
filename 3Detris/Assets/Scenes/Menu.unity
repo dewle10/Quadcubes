@@ -2759,8 +2759,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetInvertY
         m_Mode: 0
         m_Arguments:
@@ -4466,7 +4466,7 @@ GameObject:
   - component: {fileID: 308036466}
   - component: {fileID: 308036469}
   m_Layer: 0
-  m_Name: Challange
+  m_Name: Challenge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6085,7 +6085,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Challange
+  m_text: Challenge
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 02dc1618f4df74441a1bed64d7ad5625, type: 2}
   m_sharedMaterial: {fileID: 7286552311462638767, guid: 02dc1618f4df74441a1bed64d7ad5625, type: 2}
@@ -6841,8 +6841,8 @@ GameObject:
   - component: {fileID: 474893682}
   - component: {fileID: 474893681}
   - component: {fileID: 474893684}
+  - component: {fileID: 474893689}
   - component: {fileID: 474893685}
-  - component: {fileID: 474893687}
   - component: {fileID: 474893688}
   m_Layer: 0
   m_Name: Menu canvas
@@ -6950,37 +6950,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5cf5ad60e68cfc42bb44e15fb906e5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volume: {fileID: 698624065}
   mainMenu: {fileID: 1245174704}
   settingsMenu: {fileID: 369554413}
   gameModeMenu: {fileID: 1581624012}
-  leaderbordsMenu: {fileID: 1847944526}
+  leaderboardsMenu: {fileID: 1847944526}
   controlsMenu: {fileID: 205552810}
   logo: {fileID: 1073441218}
-  soundsMixer: {fileID: 24100000, guid: 4553117612adfe74d95880e17d5de880, type: 2}
-  musicMixer: {fileID: 24100000, guid: 2faa5f5d557e84647b861fb96b75d23b, type: 2}
-  invertXToggle: {fileID: 1005852669}
-  invertYToggle: {fileID: 144447083}
-  vSyncToggle: {fileID: 903545727}
-  resolutionDropdown: {fileID: 1437277282}
-  qualityDropdown: {fileID: 1266316641}
-  screenModeDropdown: {fileID: 1234066711}
-  soundsSlider: {fileID: 479495145}
-  musicSlider: {fileID: 1276581868}
-  senHorSlider: {fileID: 587732617}
-  senVerSlider: {fileID: 767656485}
-  senPadSlider: {fileID: 1708950440}
-  senZoomSlider: {fileID: 2142716246}
-  gammaSlider: {fileID: 990390871}
-  maxFpsSlider: {fileID: 1750481574}
-  soundsText: {fileID: 299645926}
-  musicText: {fileID: 1358422937}
-  senHorText: {fileID: 96696411}
-  senVerText: {fileID: 1048091794}
-  senPadText: {fileID: 1396024673}
-  senZoomText: {fileID: 1506707384}
-  gammaText: {fileID: 1719628602}
-  maxFpsText: {fileID: 486791731}
   startButton: {fileID: 1872279770}
   startText: {fileID: 1104535146}
   modeButtons:
@@ -6991,7 +6966,7 @@ MonoBehaviour:
   - {fileID: 1705825836}
   - {fileID: 1349005135}
   selectedColor: {r: 1, g: 1, b: 1, a: 0.3882353}
-  normalColor: {r: 1, g: 1, b: 1, a: 0}
+  colorNormal: {r: 0, g: 0, b: 0, a: 0}
   firstSelected: {fileID: 95125075}
   firstSelectedSettings: {fileID: 1437277280}
 --- !u!114 &474893685
@@ -7007,62 +6982,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 0
-  sizeFilter: 4
   content: {fileID: 1943243080}
   scoreItem: {fileID: 7230374569029635256, guid: 8dc055d239904c9448fe2bef4e7b4ae4, type: 3}
   font: {fileID: 11400000, guid: 02dc1618f4df74441a1bed64d7ad5625, type: 2}
---- !u!114 &474893687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 474893679}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84cd9b84e0604a9abafb77712f1df90a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  xbox:
-    buttonSouth: {fileID: 21300000, guid: f609c9b3b1675f947a865ec558b5ad90, type: 3}
-    buttonNorth: {fileID: 21300000, guid: 17fd7d74524d4cc4ea612a100880d012, type: 3}
-    buttonEast: {fileID: 21300000, guid: d08c52c09554ca8418a86627f4bd14e1, type: 3}
-    buttonWest: {fileID: 21300000, guid: cde7469096582e04897fae80dfc34fbe, type: 3}
-    startButton: {fileID: 21300000, guid: 5c1e24bea89729e4a8ed25e26a432f84, type: 3}
-    selectButton: {fileID: 21300000, guid: 4273c283a5e145a468dc60af5dcb46e7, type: 3}
-    leftTrigger: {fileID: 21300000, guid: d29819659aa175a459d7c519a30d70aa, type: 3}
-    rightTrigger: {fileID: 21300000, guid: 0ae60af4bd5e539409acc10ec4300105, type: 3}
-    leftShoulder: {fileID: 21300000, guid: 672696fcd6aec9d4c84945fa59765f64, type: 3}
-    rightShoulder: {fileID: 21300000, guid: ed60ff0de79971e468ae179e077d66ca, type: 3}
-    dpad: {fileID: 21300000, guid: d1610599218d48042bffac0712c379a6, type: 3}
-    dpadUp: {fileID: 21300000, guid: 4cc6aa9aa8107734da22c80d289cff98, type: 3}
-    dpadDown: {fileID: 21300000, guid: d544feb63b186dd45b32d12cfc6762bf, type: 3}
-    dpadLeft: {fileID: 21300000, guid: 44d8f279ef345c442ae875caa0c26731, type: 3}
-    dpadRight: {fileID: 21300000, guid: cfa9b832ea5877745a96e61e8ffaeca2, type: 3}
-    leftStick: {fileID: 21300000, guid: 139b83464b859cd429d0370dc816028c, type: 3}
-    rightStick: {fileID: 21300000, guid: 9c61f7c9d0b7b8b4f9d2350b73289e23, type: 3}
-    leftStickPress: {fileID: 21300000, guid: 139b83464b859cd429d0370dc816028c, type: 3}
-    rightStickPress: {fileID: 21300000, guid: 9c61f7c9d0b7b8b4f9d2350b73289e23, type: 3}
-  ps4:
-    buttonSouth: {fileID: 21300000, guid: 2da2d15ce082e12448ac493c55a33f0f, type: 3}
-    buttonNorth: {fileID: 21300000, guid: 47b0c8cbcd450124abdb1b62fb7f5806, type: 3}
-    buttonEast: {fileID: 21300000, guid: c7f381483fb41f14e935b2d6d9fec62f, type: 3}
-    buttonWest: {fileID: 21300000, guid: 428de70370df69d45bd4c0025b7ba36e, type: 3}
-    startButton: {fileID: 21300000, guid: 3e20a6306ae08e34f970de090c3a1cd1, type: 3}
-    selectButton: {fileID: 21300000, guid: a521d4effb3d3c64b9329370383eb640, type: 3}
-    leftTrigger: {fileID: 21300000, guid: f920addac480add4c99e64df920b61a3, type: 3}
-    rightTrigger: {fileID: 21300000, guid: 87dce22414624c74d90f8bfc4bf3582f, type: 3}
-    leftShoulder: {fileID: 21300000, guid: 7eaab648006558044a9680311037b8f9, type: 3}
-    rightShoulder: {fileID: 21300000, guid: 22b97dfa5af0d1947a62312c31e633e5, type: 3}
-    dpad: {fileID: 21300000, guid: bff5253ebc5a14f43b4bd8aa1d207855, type: 3}
-    dpadUp: {fileID: 21300000, guid: f375a935d0c38f84d94844236012f26c, type: 3}
-    dpadDown: {fileID: 21300000, guid: 5fc2490d4f2941f4ca46f33e329cf3d7, type: 3}
-    dpadLeft: {fileID: 21300000, guid: 4cb9b89846007d142a4a78a190c2d6fe, type: 3}
-    dpadRight: {fileID: 21300000, guid: be71706bc979d5240bf156bfdfee0ae6, type: 3}
-    leftStick: {fileID: 21300000, guid: 7e177675a5fc16248b6e164ef7a7f2a6, type: 3}
-    rightStick: {fileID: 21300000, guid: 04f2711270cd5b64099d2ca2f99529de, type: 3}
-    leftStickPress: {fileID: 21300000, guid: 7e177675a5fc16248b6e164ef7a7f2a6, type: 3}
-    rightStickPress: {fileID: 21300000, guid: 04f2711270cd5b64099d2ca2f99529de, type: 3}
 --- !u!114 &474893688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7076,6 +6998,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+--- !u!114 &474893689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474893679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 141211ca283d09f43a34c61b117a32bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  invertXToggle: {fileID: 1005852669}
+  invertYToggle: {fileID: 144447083}
+  vSyncToggle: {fileID: 903545727}
+  resolutionDropdown: {fileID: 1437277282}
+  screenModeDropdown: {fileID: 1234066711}
+  soundsSlider: {fileID: 479495145}
+  musicSlider: {fileID: 1276581868}
+  senHorSlider: {fileID: 587732617}
+  senVerSlider: {fileID: 767656485}
+  senPadSlider: {fileID: 1708950440}
+  senZoomSlider: {fileID: 2142716246}
+  gammaSlider: {fileID: 990390871}
+  maxFpsSlider: {fileID: 1750481574}
+  soundsMixer: {fileID: 24100000, guid: 4553117612adfe74d95880e17d5de880, type: 2}
+  musicMixer: {fileID: 24100000, guid: 2faa5f5d557e84647b861fb96b75d23b, type: 2}
+  volume: {fileID: 698624065}
+  soundsText: {fileID: 299645926}
+  musicText: {fileID: 1358422937}
+  senHorText: {fileID: 96696411}
+  senVerText: {fileID: 1048091794}
+  senPadText: {fileID: 1396024673}
+  senZoomText: {fileID: 1506707384}
+  gammaText: {fileID: 1719628602}
+  maxFpsText: {fileID: 486791731}
 --- !u!1 &479495143
 GameObject:
   m_ObjectHideFlags: 0
@@ -7169,8 +7127,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetVolumeSounds
         m_Mode: 0
         m_Arguments:
@@ -9360,8 +9318,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetSensitivityHorizontal
         m_Mode: 0
         m_Arguments:
@@ -12057,8 +12015,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetSensitivityVertical
         m_Mode: 0
         m_Arguments:
@@ -13295,8 +13253,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetVsync
         m_Mode: 0
         m_Arguments:
@@ -14319,8 +14277,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetGamma
         m_Mode: 0
         m_Arguments:
@@ -14598,8 +14556,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetInvertX
         m_Mode: 0
         m_Arguments:
@@ -14792,7 +14750,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Challange
+  m_text: Challenge
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 02dc1618f4df74441a1bed64d7ad5625, type: 2}
   m_sharedMaterial: {fileID: 7286552311462638767, guid: 02dc1618f4df74441a1bed64d7ad5625, type: 2}
@@ -18306,8 +18264,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetScreenMode
         m_Mode: 0
         m_Arguments:
@@ -19386,8 +19344,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetVolumeMusic
         m_Mode: 0
         m_Arguments:
@@ -21143,8 +21101,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetResolution
         m_Mode: 0
         m_Arguments:
@@ -23905,8 +23863,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetSensitivityGamepad
         m_Mode: 0
         m_Arguments:
@@ -24622,8 +24580,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetMaxFPS
         m_Mode: 0
         m_Arguments:
@@ -26954,7 +26912,7 @@ GameObject:
   - component: {fileID: 1927297557}
   - component: {fileID: 1927297560}
   m_Layer: 0
-  m_Name: Challange
+  m_Name: Challenge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29840,8 +29798,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 474893684}
-        m_TargetAssemblyTypeName: Menu, Assembly-CSharp
+      - m_Target: {fileID: 474893689}
+        m_TargetAssemblyTypeName: SettingsManager, Assembly-CSharp
         m_MethodName: SetSensitivityZoom
         m_Mode: 0
         m_Arguments:

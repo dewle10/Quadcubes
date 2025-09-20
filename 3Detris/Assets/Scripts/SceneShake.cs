@@ -13,7 +13,14 @@ public class SceneShake : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            instance = this;
+        }
         originalPos = instance.transform.localPosition;
     }
 
@@ -24,11 +31,6 @@ public class SceneShake : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            Shake();
-        }
-
         if (timeLeft > 0)
         {
             float strength = (timeLeft / duration) * magnitude;

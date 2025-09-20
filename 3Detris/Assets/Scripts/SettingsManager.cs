@@ -3,19 +3,31 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-public class PauseSettings : MonoBehaviour
+
+public enum OptionsValues
 {
-    [SerializeField] private Volume volume;
-    private ColorAdjustments colorAdjustments;
+    SensitivityVer,
+    SensitivityHor,
+    SensitivityPad,
+    VolumeMusic,
+    VolumeSounds,
+    Quality,
+    ScreenMode,
+    Resolution,
+    InvertX,
+    InvertY,
+    VSync,
+    MaxFPS,
+    Gamma,
+    SensitivityZoom
+}
 
-    [SerializeField] private AudioMixer soundsMixer;
-    [SerializeField] private AudioMixer musicMixer;
-
+public class SettingsManager : MonoBehaviour
+{
+    [Header("Settings UI")]
     [SerializeField] private Toggle invertXToggle;
     [SerializeField] private Toggle invertYToggle;
     [SerializeField] private Toggle vSyncToggle;
@@ -29,7 +41,12 @@ public class PauseSettings : MonoBehaviour
     [SerializeField] private Slider senZoomSlider;
     [SerializeField] private Slider gammaSlider;
     [SerializeField] private Slider maxFpsSlider;
-
+    [Header("Settings Objects")]
+    [SerializeField] private AudioMixer soundsMixer;
+    [SerializeField] private AudioMixer musicMixer;
+    [SerializeField] private Volume volume;
+    private ColorAdjustments colorAdjustments;
+    [Header("SettingsTexts")]
     [SerializeField] private TMP_Text soundsText;
     [SerializeField] private TMP_Text musicText;
     [SerializeField] private TMP_Text senHorText;
@@ -38,14 +55,11 @@ public class PauseSettings : MonoBehaviour
     [SerializeField] private TMP_Text senZoomText;
     [SerializeField] private TMP_Text gammaText;
     [SerializeField] private TMP_Text maxFpsText;
-
-    //[SerializeField] private GameObject firstSelected;
-
+    //Resolution
     private Resolution[] resolutions;
     private List<Resolution> filteredResolutions;
-
-    private float currentRefreshRate;
     private int currentResolutionIndex;
+    private float currentRefreshRate;
 
     private void Awake()
     {
@@ -54,24 +68,24 @@ public class PauseSettings : MonoBehaviour
 
     private void Start()
     {
-        ResolutionStart(); //defoult: hightest Resolution
+        ResolutionStart(); //default: hightest Resolution
 
-        soundsSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeSounds.ToString(), 1);
-        musicSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeMusic.ToString(), 1);
+        soundsSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.VolumeSounds), 1);
+        musicSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.VolumeMusic), 1);
 
-        senHorSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
-        senVerSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
-        senPadSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
-        senZoomSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityZoom.ToString(), 100);
+        senHorSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityHor), 15);
+        senVerSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityVer), 10);
+        senPadSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityPad), 10);
+        senZoomSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityZoom), 100);
 
-        gammaSlider.value = PlayerPrefs.GetFloat(OptionsValues.Gamma.ToString(), 0);
-        maxFpsSlider.value = PlayerPrefs.GetFloat(OptionsValues.MaxFPS.ToString(), 144);
+        gammaSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.Gamma), 0);
+        maxFpsSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.MaxFPS), 144);
 
-        screenModeDropdown.value = PlayerPrefs.GetInt(OptionsValues.ScreenMode.ToString(), 1); //defoult: fullscreen Window
+        screenModeDropdown.value = PlayerPrefs.GetInt(nameof(OptionsValues.ScreenMode), 1); //default: fullscreen Window
 
-        int VSyncint = PlayerPrefs.GetInt(OptionsValues.VSync.ToString(), 0); //defoult: off
-        int invertXint = PlayerPrefs.GetInt(OptionsValues.InvertX.ToString(), 0); //defoult: off
-        int invertYint = PlayerPrefs.GetInt(OptionsValues.InvertY.ToString(), 0); //defoult: off
+        int VSyncint = PlayerPrefs.GetInt(nameof(OptionsValues.VSync), 0); //default: off
+        int invertXint = PlayerPrefs.GetInt(nameof(OptionsValues.InvertX), 0); //default: off
+        int invertYint = PlayerPrefs.GetInt(nameof(OptionsValues.InvertY), 0); //default: off
         vSyncToggle.isOn = VSyncint == 1;
         invertXToggle.isOn = invertXint == 1;
         invertYToggle.isOn = invertYint == 1;
@@ -88,84 +102,86 @@ public class PauseSettings : MonoBehaviour
         maxFpsText.text = maxFpsSlider.value.ToString("0.");
     }
 
+    #region Settings
     public void SetVolumeSounds(float volume)
     {
         soundsMixer.SetFloat("Volume", Mathf.Log10(volume) * 20);
         soundsText.text = (soundsSlider.value * 100).ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.VolumeSounds.ToString(), volume);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.VolumeSounds), volume);
     }
     public void SetVolumeMusic(float volume)
     {
         musicMixer.SetFloat("Volume", Mathf.Log10(volume) * 20);
         musicText.text = (musicSlider.value * 100).ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.VolumeMusic.ToString(), volume);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.VolumeMusic), volume);
     }
     public void SetGamma(float value)
     {
         colorAdjustments.postExposure.Override(value);
         gammaText.text = gammaSlider.value.ToString("0.#");
-        PlayerPrefs.SetFloat(OptionsValues.Gamma.ToString(), value);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.Gamma), value);
     }
     public void SetMaxFPS(float value)
     {
         Application.targetFrameRate = Mathf.RoundToInt(value);
         maxFpsText.text = maxFpsSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.MaxFPS.ToString(), value);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.MaxFPS), value);
     }
     public void SetVsync(bool IsOn)
     {
         int value = IsOn ? 1 : 0;
         QualitySettings.vSyncCount = value;
-        PlayerPrefs.SetInt(OptionsValues.VSync.ToString(), value);
+        PlayerPrefs.SetInt(nameof(OptionsValues.VSync), value);
     }
     public void SetInvertX(bool value)
     {
-        PlayerPrefs.SetInt(OptionsValues.InvertX.ToString(), value ? 1 : 0);
+        PlayerPrefs.SetInt(nameof(OptionsValues.InvertX), value ? 1 : 0);
     }
     public void SetInvertY(bool value)
     {
-        PlayerPrefs.SetInt(OptionsValues.InvertY.ToString(), value ? 1 : 0);
+        PlayerPrefs.SetInt(nameof(OptionsValues.InvertY), value ? 1 : 0);
     }
 
     public void SetQuality(int qualityIndex)
     {
         QualitySettings.SetQualityLevel(qualityIndex);
-        PlayerPrefs.SetInt(OptionsValues.Quality.ToString(), qualityIndex);
+        PlayerPrefs.SetInt(nameof(OptionsValues.Quality), qualityIndex);
     }
 
     public void SetScreenMode(int screenMode)
     {
         Screen.fullScreenMode = (FullScreenMode)screenMode;
-        PlayerPrefs.SetInt(OptionsValues.ScreenMode.ToString(), screenMode);
+        PlayerPrefs.SetInt(nameof(OptionsValues.ScreenMode), screenMode);
     }
 
     public void SetResolution(int resolutionIndex)
     {
         Resolution resolution = filteredResolutions[resolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, (FullScreenMode)PlayerPrefs.GetInt(OptionsValues.ScreenMode.ToString(), 1));
-        PlayerPrefs.SetInt(OptionsValues.Resolution.ToString(), resolutionIndex);
+        Screen.SetResolution(resolution.width, resolution.height, (FullScreenMode)PlayerPrefs.GetInt(nameof(OptionsValues.ScreenMode), 1));
+        PlayerPrefs.SetInt(nameof(OptionsValues.Resolution), resolutionIndex);
     }
 
     public void SetSensitivityHorizontal(float Sensitivity)
     {
         senHorText.text = senHorSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityHor.ToString(), Sensitivity);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.SensitivityHor), Sensitivity);
     }
     public void SetSensitivityVertical(float Sensitivity)
     {
         senVerText.text = senVerSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityVer.ToString(), Sensitivity);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.SensitivityVer), Sensitivity);
     }
     public void SetSensitivityGamepad(float Sensitivity)
     {
         senPadText.text = senPadSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityPad.ToString(), Sensitivity);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.SensitivityPad), Sensitivity);
     }
     public void SetSensitivityZoom(float Sensitivity)
     {
         senZoomText.text = (senZoomSlider.value / 2).ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityZoom.ToString(), Sensitivity);
+        PlayerPrefs.SetFloat(nameof(OptionsValues.SensitivityZoom), Sensitivity);
     }
+    #endregion
 
     private void ResolutionStart()
     {
@@ -194,7 +210,6 @@ public class PauseSettings : MonoBehaviour
         for (int i = 0; i < filteredResolutions.Count; i++)
         {
             string resolutionOption = filteredResolutions[i].width + "x" + filteredResolutions[i].height;
-            // + " " + filteredResolutions[i].refreshRateRatio.value.ToString("0.##") + " Hz";
 
             options.Add(resolutionOption);
 
@@ -206,7 +221,12 @@ public class PauseSettings : MonoBehaviour
         }
 
         resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = currentResolutionIndex = PlayerPrefs.GetInt(OptionsValues.Resolution.ToString(), 0);
+        resolutionDropdown.value = currentResolutionIndex = PlayerPrefs.GetInt(nameof(OptionsValues.Resolution), 0);
         resolutionDropdown.RefreshShownValue();
+    }
+    public void SetResolution()
+    {
+        Resolution resolution = filteredResolutions[currentResolutionIndex];
+        Screen.SetResolution(resolution.width, resolution.height, (FullScreenMode)PlayerPrefs.GetInt(nameof(OptionsValues.ScreenMode), 1));
     }
 }

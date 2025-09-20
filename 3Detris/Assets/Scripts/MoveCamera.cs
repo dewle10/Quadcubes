@@ -27,25 +27,25 @@ public class MoveCamera : MonoBehaviour
     [Header("Invert")]
     [SerializeField] private bool invertX;
     [SerializeField] private bool invertY;
+    private float invertXValue;
+    private float invertYValue;
+
+    private float targetAngleX, targetAngleY, targetDistance;
+    private float smoothAngleX, smoothAngleY, smoothDistance;
+    private float angleXVelocity, angleYVelocity, distanceVelocity;
     //Inputs
     private PlayerInput playerInput;
     private InputAction lookAction, zoomAction;
-    private InputAction lookLRAction, lookDUAction, zoomInOutAction;
+    private InputAction lookHorAction, lookVerAction, zoomInOutAction;
     private bool usingPad;
-    //Targets
-    private float targetAngleX, targetAngleY, targetDistance;
-    //Smoothed
-    private float smoothAngleX, smoothAngleY, smoothDistance;
-    //Velocities for SmoothDamp
-    private float angleXVelocity, angleYVelocity, distanceVelocity;
 
     private void Awake()
     {
         playerInput = gameObject.GetComponent<PlayerInput>();
         lookAction = playerInput.actions["Look"];
         zoomAction = playerInput.actions["ZoomScroll"];
-        lookLRAction = playerInput.actions["Look Horizontal"];
-        lookDUAction = playerInput.actions["Look Vertical"];
+        lookHorAction = playerInput.actions["Look Horizontal"];
+        lookVerAction = playerInput.actions["Look Vertical"];
         zoomInOutAction = playerInput.actions["Zoom"];
     }
     private void Start()
@@ -53,11 +53,8 @@ public class MoveCamera : MonoBehaviour
         targetDistance = Vector3.Distance(pivotPoint.position, cam.transform.position);
         smoothDistance = targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
 
-        float sAngleX = -startAngleX;
-        float sAngleY = startAngleY - 180f;
-        startAngleX = Mathf.Clamp(sAngleX, minAngleX, maxAngleX);
-        targetAngleX = smoothAngleX = sAngleX;
-        targetAngleY = smoothAngleY = sAngleY;
+        targetAngleX = smoothAngleX = Mathf.Clamp(-startAngleX, minAngleX, maxAngleX);
+        targetAngleY = smoothAngleY = startAngleY - 180f;
 
         Quaternion rot = Quaternion.Euler(smoothAngleX, smoothAngleY, 0f);
         Vector3 startOffset = rot * Vector3.forward * smoothDistance;
@@ -66,14 +63,15 @@ public class MoveCamera : MonoBehaviour
 
         SetSettingsValues();
 
-        StartCoroutine(StartPasue());
+        StartCoroutine(StartPause());
     }
+    
     private void OnEnable()
     {
         lookAction.Enable();
         zoomAction.Enable();
-        lookLRAction.Enable();
-        lookDUAction.Enable();
+        lookHorAction.Enable();
+        lookVerAction.Enable();
         zoomInOutAction.Enable();
         playerInput.onControlsChanged += OnControlsChanged;
     }
@@ -81,27 +79,22 @@ public class MoveCamera : MonoBehaviour
     {
         lookAction.Disable();
         zoomAction.Disable();
-        lookLRAction.Disable();
-        lookDUAction.Disable();
+        lookHorAction.Disable();
+        lookVerAction.Disable();
         zoomInOutAction.Disable();
         playerInput.onControlsChanged -= OnControlsChanged;
     }
     private void Update()
     {
-        OnControlsChanged(playerInput);
-
         //Zoom target
-        float scroll = zoomAction.ReadValue<Vector2>().y;
-        if (Mathf.Abs(scroll) > 0.01f)
+        float zoomInput = zoomAction.ReadValue<Vector2>().y - zoomInOutAction.ReadValue<float>() * 0.2f;
+        if (Mathf.Abs(zoomInput) > 0.01f)
         {
-            targetDistance -= scroll * zoomSpeed * Time.deltaTime;
-            targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
+            targetDistance = Mathf.Clamp(
+                targetDistance - zoomInput * zoomSpeed * Time.deltaTime,
+                minDistance, maxDistance
+            );
         }
-
-        float zoomDir = zoomInOutAction.ReadValue<float>();
-        if (zoomInOutAction.IsPressed())
-            targetDistance = Mathf.Clamp(targetDistance + zoomSpeed * zoomDir * Time.deltaTime * 0.2f, minDistance, maxDistance);
-
         //Rotation target
         if (!isStartPause)
         {
@@ -110,21 +103,17 @@ public class MoveCamera : MonoBehaviour
             {
                 delta *= padLookSpeed;
             }
-
-            float invertXValue = invertX ? -1f : 1f;
-            float invertYValue = invertY ? -1f : 1f;
-
             targetAngleY += delta.x * horizontalSpeed * Time.deltaTime * invertXValue;
             targetAngleX = Mathf.Clamp(targetAngleX + delta.y * verticalSpeed * Time.deltaTime * invertYValue, minAngleX, maxAngleX);
         }
         //Rotation On Buttons
-        float lookLRDir = lookLRAction.ReadValue<float>();
-        if (lookLRAction.triggered)
+        float lookLRDir = lookHorAction.ReadValue<float>();
+        if (lookHorAction.triggered)
         {
             targetAngleY += 90f * lookLRDir;
         }
-        float lookDUDir = lookDUAction.ReadValue<float>();
-        if (lookDUAction.triggered)
+        float lookDUDir = lookVerAction.ReadValue<float>();
+        if (lookVerAction.triggered)
         {
             targetAngleX = Mathf.Clamp(targetAngleX + 30f * lookDUDir, minAngleX, maxAngleX);
         }
@@ -151,15 +140,17 @@ public class MoveCamera : MonoBehaviour
     }
     public void SetSettingsValues()
     {
-        horizontalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
-        verticalSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
-        padLookSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
-        zoomSpeed = PlayerPrefs.GetFloat(OptionsValues.SensitivityZoom.ToString(), 90);
+        horizontalSpeed = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityHor), 15);
+        verticalSpeed = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityVer), 10);
+        padLookSpeed = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityPad), 10);
+        zoomSpeed = PlayerPrefs.GetFloat(nameof(OptionsValues.SensitivityZoom), 90);
 
-        invertX = PlayerPrefs.GetInt(OptionsValues.InvertX.ToString(), 0) == 1;
-        invertY = PlayerPrefs.GetInt(OptionsValues.InvertY.ToString(), 0) == 1;
+        invertX = PlayerPrefs.GetInt(nameof(OptionsValues.InvertX), 0) == 1;
+        invertY = PlayerPrefs.GetInt(nameof(OptionsValues.InvertY), 0) == 1;
+        invertXValue = invertX ? -1f : 1f;
+        invertYValue = invertY ? -1f : 1f;
     }
-    private IEnumerator StartPasue()
+    private IEnumerator StartPause()
     {
         isStartPause = true;
         yield return new WaitForSeconds(1f);

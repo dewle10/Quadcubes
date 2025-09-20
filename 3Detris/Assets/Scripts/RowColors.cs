@@ -1,26 +1,32 @@
-using System.Collections;
-using System.Reflection;
 using UnityEngine;
 
-public class RowColors : MonoBehaviour
+public class RowColors
 {
-    readonly private static float outerBrightness = 1f;
-    readonly private static float middleBrightness = 0.9f;
-    readonly private static float innerBrightness = 0.8f;
+    private const float OuterBrightness = 1f;
+    private const float MiddleBrightness = 0.9f;
+    private const float InnerBrightness = 0.8f;
 
     public static void ChangeColor(GameObject cube)
     {
+        VisualEffects visualEffects = cube.GetComponentInChildren<VisualEffects>();
+
         Vector3 pos = cube.transform.position;
-        MeshRenderer renderer = cube.GetComponentInChildren<MeshRenderer>();
-        ChangeColor changeColor = cube.GetComponentInChildren<ChangeColor>();
-
-        if (renderer == null) return;
-
         int x = (int)pos.x;
         int y = (int)pos.y;
         int z = (int)pos.z;
 
-        Color baseColor = y switch
+        Color baseColor = GetBaseColor(y);
+
+        float brightness = GetBrightness(x, z);
+
+        Color newColor = baseColor * brightness;
+        newColor.a = 1f;
+
+        visualEffects.StartCoroutine(visualEffects.ChangeColor(newColor));
+    }
+    private static Color GetBaseColor(int y)
+    {
+        return y switch
         {
             0 => HexToColor("#FF3945"),
             1 => HexToColor("#2AE371"),
@@ -36,32 +42,25 @@ public class RowColors : MonoBehaviour
             11 => HexToColor("#D588F2"),
             _ => Color.red
         };
+    }
+    private static float GetBrightness(int x, int z)
+    {
+        int width = GridManager.gameWidth;
 
-        float brightness;
+        // Outer layer
+        if (x == 0 || x == width - 1 || z == 0 || z == width - 1)
+            return OuterBrightness;
 
-        if (x == 0 || x == GridManager.gameWidth - 1 || z == 0 || z == GridManager.gameWidth - 1) //outer
-        {
-            brightness = outerBrightness;
-        }
-        else if (GridManager.gameWidth == 5 && x == 2 && z == 2) //inner for game size 5
-        {
-            brightness = innerBrightness;
-        }
-        else if (GridManager.gameWidth != 5 && 
-            (x >= GridManager.gameWidth/2 - 1 && x <= GridManager.gameWidth/2) && 
-            (z >= GridManager.gameWidth/2 - 1 && z <= GridManager.gameWidth/2) ) //inner
-        {
-            brightness = innerBrightness;
-        }
-        else //middle
-        {
-            brightness = middleBrightness;
-        }
+        // Inner layer for 5x5
+        if (width == 5 && x == 2 && z == 2)
+            return InnerBrightness;
 
-        Color newColor = baseColor * brightness;
-        newColor.a = 1f;
+        // Inner layer for other sizes
+        if (width != 5 && (x >= width / 2 - 1 && x <= width / 2) && (z >= width / 2 - 1 && z <= width / 2))
+            return InnerBrightness;
 
-        changeColor.StartCoroutine(changeColor.Change(newColor));
+        // Middle layer
+        return MiddleBrightness;
     }
     private static Color HexToColor(string hex)
     {
@@ -70,17 +69,4 @@ public class RowColors : MonoBehaviour
         else
             return Color.magenta;
     }
-
-    //if (x == 0 || x == 5 || z == 0 || z == 5) //outer
-    //{
-    //    finalColor.a = 0.15f;
-    //}
-    //else if ((x >= 2 && x <= 3) && (z >= 2 && z <= 3)) //inner
-    //{
-    //    finalColor.a = 0.15f;
-    //}
-    //else //middle
-    //{
-    //    finalColor.a = 0.15f;
-    //}
 }

@@ -9,6 +9,13 @@ public class LoadingScreen : MonoBehaviour
 
     void Start()
     {
+        if (string.IsNullOrEmpty(sceneToLoad))
+        {
+            Debug.LogWarning("Error:sceneToLoad is not set");
+            SceneManager.LoadScene(0);
+            return;
+        }
+
         StartCoroutine(LoadSceneAsync());
     }
 
@@ -21,7 +28,7 @@ public class LoadingScreen : MonoBehaviour
         {
             if (asyncLoad.progress >= 0.9f)
             {
-                yield return new WaitForSeconds(0.3f);
+                yield return new WaitForSeconds(0.2f);
                 asyncLoad.allowSceneActivation = true;
             }
             yield return null;

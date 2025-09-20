@@ -6,7 +6,7 @@ public class HologramGlitch : MonoBehaviour
     public float glitchChance = 0.1f;
 
     Material hologramMaterial;
-    WaitForSeconds glitchLoopWait = new WaitForSeconds(0.1f);
+    readonly WaitForSeconds glitchLoopWait = new(0.1f);
 
     void Awake()
     {

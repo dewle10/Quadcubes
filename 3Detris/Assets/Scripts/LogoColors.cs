@@ -2,10 +2,6 @@ using UnityEngine;
 
 public class LogoColors : MonoBehaviour
 {
-    //readonly private static float outerBrightness = 1f;
-    //readonly private static float middleBrightness = 0.8f;
-    //readonly private static float innerBrightness = 0.6f;
-
     [SerializeField] private GameObject[] meshes;
     public Color color;
 
@@ -21,13 +17,8 @@ public class LogoColors : MonoBehaviour
     {
         for (int i = 0; i < meshes.Length; i++)
         {
-            Vector3 pos = meshes[i].transform.position;
             MeshRenderer renderer = meshes[i].GetComponentInChildren<MeshRenderer>();
             if (renderer == null) return;
-            
-            int x = (int)pos.x;
-            int y = (int)pos.y;
-            int z = (int)pos.z;
 
             Color baseColor = Random.Range(0, 12) switch
             {

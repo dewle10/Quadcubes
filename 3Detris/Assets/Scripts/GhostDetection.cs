@@ -3,72 +3,49 @@ using UnityEngine;
 public class GhostDetection : MonoBehaviour
 {
     private LayerMask obstacleLayer;
-    private Vector3 checkSize = new Vector3(0.9f, 0.9f, 0.9f);
+    private Vector3 checkSize = new(0.9f, 0.9f, 0.9f);
     private Collider[] hits = new Collider[1];
-    private Vector3 kickDirection;
-    private bool wallHit = false;
+    public Vector3 KickDirection { get; private set; }
+    public bool WallHit { get; private set; }
 
     private void Start()
     {
         obstacleLayer = LayerMask.GetMask("Solid");
     }
-    public bool GetghostHitMove(Vector3 directionVector)
+    public bool GetghostHitMove(Vector3 directionVector) //Checks if moving would cause a collision
     {
-        hits[0] = null;
-        int numHits = Physics.OverlapBoxNonAlloc(
-            transform.position + directionVector,
-            checkSize / 2,
-            hits,
-            transform.rotation,
-            obstacleLayer
-        );
-        //if (numHits > 0)
-            //Debug.Log(numHits+ " " + gameObject.name);
-        return numHits > 0;
+        return CheckCollision(transform.position + directionVector) > 0;
     }
-    public bool GetghostHitRotate()
+    public bool GetghostHitRotate() //Checks if rotation would cause a collision
     {
-        hits[0] = null;
-        int numHits = Physics.OverlapBoxNonAlloc(
-            transform.position,
-            checkSize / 2,
-            hits,
-            transform.rotation,
-            obstacleLayer
-        );
+        int numHits = CheckCollision(transform.position);
 
-        wallHit = false;
-        kickDirection = Vector3.zero;
+        WallHit = false;
+        KickDirection = Vector3.zero;
         if (hits[0] != null)
         {
             if (hits[0].gameObject.CompareTag("OutOfBounds"))
             {
-                wallHit = true;
+                WallHit = true;
                 WallKicks wallKick = hits[0].gameObject.GetComponent<WallKicks>();
                 if (wallKick.Gethitted())
-                    kickDirection = Vector3.zero;
+                    KickDirection = Vector3.zero;
                 else
-                    kickDirection = wallKick.GetKickDirectionWall();
-                //Debug.Log(hits[0].gameObject);
+                    KickDirection = wallKick.GetKickDirectionWall();
             }
         }
-        //if (numHits > 0)
-        //  Debug.Log(numHits+ " " + gameObject.name);
         return numHits > 0;
     }
 
-    public Vector3 GetKickDirection()
+    private int CheckCollision(Vector3 position)
     {
-        return kickDirection;
+        hits[0] = null;
+        return Physics.OverlapBoxNonAlloc(
+            position,
+            checkSize / 2,
+            hits,
+            transform.rotation,
+            obstacleLayer
+        );
     }
-    public bool GetWallHit()
-    {
-        return wallHit;
-    }
-
-    /*private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position + directionVector, checkSize);
-    }*/
 }

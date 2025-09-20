@@ -10,84 +10,35 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public enum OptionsValues{
-    SensitivityVer,
-    SensitivityHor,
-    SensitivityPad,
-    VolumeMusic,
-    VolumeSounds,
-    Quality,
-    ScreenMode,
-    Resolution,
-    InvertX,
-    InvertY,
-    VSync,
-    MaxFPS,
-    Gamma,
-    SensitivityZoom
-}
-
+[RequireComponent(typeof(LeaderboardDisplay))]
+[RequireComponent(typeof(SettingsManager))]
 public class Menu : MonoBehaviour
 {
-    private LeaderboardDisplay leaderboardDisplay;
-    [SerializeField] private Volume volume;
-    private ColorAdjustments colorAdjustments;
-
+    [Header("Menus")]
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject settingsMenu;
     [SerializeField] private GameObject gameModeMenu;
-    [SerializeField] private GameObject leaderbordsMenu;
+    [SerializeField] private GameObject leaderboardsMenu;
     [SerializeField] private GameObject controlsMenu;
     [SerializeField] private GameObject logo;
-    [SerializeField] private AudioMixer soundsMixer;
-    [SerializeField] private AudioMixer musicMixer;
-
-    [SerializeField] private Toggle invertXToggle;
-    [SerializeField] private Toggle invertYToggle;
-    [SerializeField] private Toggle vSyncToggle;
-    [SerializeField] private TMP_Dropdown resolutionDropdown;
-    [SerializeField] private TMP_Dropdown qualityDropdown;
-    [SerializeField] private TMP_Dropdown screenModeDropdown;
-    [SerializeField] private Slider soundsSlider;
-    [SerializeField] private Slider musicSlider;
-    [SerializeField] private Slider senHorSlider;
-    [SerializeField] private Slider senVerSlider;
-    [SerializeField] private Slider senPadSlider;
-    [SerializeField] private Slider senZoomSlider;
-    [SerializeField] private Slider gammaSlider;
-    [SerializeField] private Slider maxFpsSlider;
-
-    [SerializeField] private TMP_Text soundsText;
-    [SerializeField] private TMP_Text musicText;
-    [SerializeField] private TMP_Text senHorText;
-    [SerializeField] private TMP_Text senVerText;
-    [SerializeField] private TMP_Text senPadText;
-    [SerializeField] private TMP_Text senZoomText;
-    [SerializeField] private TMP_Text gammaText;
-    [SerializeField] private TMP_Text maxFpsText;
-
+    [Header("Start Menu")]
     [SerializeField] private Button startButton;
     [SerializeField] private TMP_Text startText;
     [SerializeField] private Button[] modeButtons;
     [SerializeField] private Button[] sizeButtons;
-
     [SerializeField] private Color selectedColor;
-    [SerializeField] private Color normalColor;
-
-    private InputAction pauseAction;
-    private InputAction backAction;
-    public static bool isOutOfMain;
-    public static bool isControls;
-    [SerializeField] private GameObject firstSelected;
-    [SerializeField] private GameObject firstSelectedSettings;
-
-    private Resolution[] resolutions;
-    private List<Resolution> filteredResolutions;
-
-    private float currentRefreshRate;
-    private int currentResolutionIndex;
+    [SerializeField] private Color colorNormal;
     private bool isModeSelected = false;
     private bool isSizeSelected = false;
+    [Header("First Selected")] //Back Button
+    [SerializeField] private GameObject firstSelected;
+    [SerializeField] private GameObject firstSelectedSettings;
+    private InputAction backAction;
+    private bool isOutOfMain;
+    private bool isControls;
+
+    private LeaderboardDisplay leaderboardDisplay;
+    private SettingsManager settingsManager;
 
     private enum GameSize
     {
@@ -100,65 +51,34 @@ public class Menu : MonoBehaviour
     private void Awake()
     {
         leaderboardDisplay = GetComponent<LeaderboardDisplay>();
-        volume.profile.TryGet(out colorAdjustments);
-
-        pauseAction = InputSystem.actions.FindAction("Pause");
+        settingsManager = GetComponent<SettingsManager>();
         backAction = InputSystem.actions.FindAction("Back");
     }
-
     private void Start()
     {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-
-        ResolutionStart(); //defoult: hightest Resolution
-
-        soundsSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeSounds.ToString(), 1); 
-        musicSlider.value = PlayerPrefs.GetFloat(OptionsValues.VolumeMusic.ToString(), 1);
-
-        senHorSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityHor.ToString(), 15);
-        senVerSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityVer.ToString(), 10);
-        senPadSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityPad.ToString(), 10);
-        senZoomSlider.value = PlayerPrefs.GetFloat(OptionsValues.SensitivityZoom.ToString(), 100);
-
-        gammaSlider.value = PlayerPrefs.GetFloat(OptionsValues.Gamma.ToString(), 0);
-        maxFpsSlider.value = PlayerPrefs.GetFloat(OptionsValues.MaxFPS.ToString(), 144);
-
-        qualityDropdown.value = PlayerPrefs.GetInt(OptionsValues.Quality.ToString(), 2); //defoult: High
-        screenModeDropdown.value = PlayerPrefs.GetInt(OptionsValues.ScreenMode.ToString(), 1); //defoult: fullscreen Window
-
-        int VSyncint = PlayerPrefs.GetInt(OptionsValues.VSync.ToString(), 0); //defoult: off
-        int invertXint = PlayerPrefs.GetInt(OptionsValues.InvertX.ToString(), 0); //defoult: off
-        int invertYint = PlayerPrefs.GetInt(OptionsValues.InvertY.ToString(), 0); //defoult: off
-        vSyncToggle.isOn = VSyncint == 1;
-        invertXToggle.isOn = invertXint == 1;
-        invertYToggle.isOn = invertYint == 1;
-
-        soundsText.text = (soundsSlider.value * 100).ToString("0.");
-        musicText.text = (musicSlider.value * 100).ToString("0.");
-
-        senHorText.text = senHorSlider.value.ToString("0.");
-        senVerText.text = senVerSlider.value.ToString("0.");
-        senPadText.text = senPadSlider.value.ToString("0.");
-        senZoomText.text = (senZoomSlider.value / 2).ToString("0.");
-
-        gammaText.text = gammaSlider.value.ToString("0.#");
-        maxFpsText.text = maxFpsSlider.value.ToString("0.");
-
+        EventSystem.current.SetSelectedGameObject(firstSelected);
+        settingsManager.SetResolution();
     }
-    void OnEnable()
+    private void OnEnable()
     {
+        backAction.Enable();
+        backAction.performed += OnBackPerformed;
         EventSystem.current.SetSelectedGameObject(firstSelected);
     }
-    private void Update()
+    private void OnDisable()
     {
-        if (backAction.WasPressedThisFrame())
-        {
-            if (isOutOfMain) BackButton();
-            else if (isControls) BackButtonControls();
-        }
+        backAction.performed -= OnBackPerformed;
+        backAction.Disable();
+    }
+    private void OnBackPerformed(InputAction.CallbackContext ctx)
+    {
+        if (isOutOfMain) BackButton();
+        else if (isControls) BackButtonControls();
     }
 
+    #region Buttons
     public void PlayButton()
     {
         isOutOfMain = true;
@@ -180,7 +100,7 @@ public class Menu : MonoBehaviour
         isOutOfMain = true;
         mainMenu.SetActive(false);
         logo.SetActive(false);
-        leaderbordsMenu.SetActive(true);
+        leaderboardsMenu.SetActive(true);
         leaderboardDisplay.Refresh();
     }
     public void OpenURLButton(string url)
@@ -203,7 +123,7 @@ public class Menu : MonoBehaviour
         logo.SetActive(true);
         gameModeMenu.SetActive(false);
         settingsMenu.SetActive(false);
-        leaderbordsMenu.SetActive(false);
+        leaderboardsMenu.SetActive(false);
         EventSystem.current.SetSelectedGameObject(firstSelected);
         SoundManager.PlaySound(SoundType.ClickButton);
     }
@@ -239,12 +159,12 @@ public class Menu : MonoBehaviour
     public void StartButton()
     {
         SoundManager.PlaySound(SoundType.ClickButton);
-        LoadingScreen.sceneToLoad = Enum.GetName(typeof(GameSize), (int)gameSize);
+        LoadingScreen.sceneToLoad = gameSize.ToString();
         SceneManager.LoadScene("Loading");
     }
     public void CasualButton()
     {
-        LinePoints.gameMode = GameMode.Casual;
+        ScoreManager.gameMode = GameMode.Casual;
         SoundManager.PlaySound(SoundType.ClickButton);
 
         isModeSelected = true;
@@ -253,7 +173,7 @@ public class Menu : MonoBehaviour
     }
     public void ChallangeButton()
     {
-        LinePoints.gameMode = GameMode.Challange;
+        ScoreManager.gameMode = GameMode.Challange;
         SoundManager.PlaySound(SoundType.ClickButton);
 
         isModeSelected = true;
@@ -265,92 +185,14 @@ public class Menu : MonoBehaviour
         SoundManager.PlaySound(SoundType.ClickButton);
         Application.Quit();
     }
-
-    public void SetVolumeSounds(float volume)
-    {
-        soundsMixer.SetFloat("Volume", Mathf.Log10(volume) * 20);
-        soundsText.text = (soundsSlider.value * 100).ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.VolumeSounds.ToString(), volume);
-    }
-    public void SetVolumeMusic(float volume)
-    {
-        musicMixer.SetFloat("Volume", Mathf.Log10(volume) * 20);
-        musicText.text = (musicSlider.value * 100).ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.VolumeMusic.ToString(), volume);
-    }
-    public void SetGamma(float value)
-    {
-        colorAdjustments.postExposure.Override(value);
-        gammaText.text = gammaSlider.value.ToString("0.#");
-        PlayerPrefs.SetFloat(OptionsValues.Gamma.ToString(), value);
-    }
-    public void SetMaxFPS(float value)
-    {
-        Application.targetFrameRate = Mathf.RoundToInt(value);
-        maxFpsText.text = maxFpsSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.MaxFPS.ToString(), value);
-    }
-    public void SetVsync(bool IsOn)
-    {
-        int value = IsOn ? 1 : 0;
-        QualitySettings.vSyncCount = value;
-        PlayerPrefs.SetInt(OptionsValues.VSync.ToString(), value);
-    }
-    public void SetInvertX(bool value)
-    {
-        PlayerPrefs.SetInt(OptionsValues.InvertX.ToString(), value ? 1 : 0);
-    }
-    public void SetInvertY(bool value)
-    {
-        PlayerPrefs.SetInt(OptionsValues.InvertY.ToString(), value ? 1 : 0);
-    }
-
-    public void SetQuality(int qualityIndex)
-    {
-        QualitySettings.SetQualityLevel(qualityIndex);
-        PlayerPrefs.SetInt(OptionsValues.Quality.ToString(), qualityIndex);
-    }
-
-    public void SetScreenMode(int screenMode)
-    {
-        Screen.fullScreenMode = (FullScreenMode)screenMode;
-        PlayerPrefs.SetInt(OptionsValues.ScreenMode.ToString(), screenMode);
-    }
-
-    public void SetResolution(int resolutionIndex)
-    {
-        Resolution resolution = filteredResolutions[resolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, (FullScreenMode)PlayerPrefs.GetInt(OptionsValues.ScreenMode.ToString(), 1));
-        PlayerPrefs.SetInt(OptionsValues.Resolution.ToString(), resolutionIndex);
-    }
-
-    public void SetSensitivityHorizontal(float Sensitivity)
-    {
-        senHorText.text = senHorSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityHor.ToString(), Sensitivity);
-    }
-    public void SetSensitivityVertical(float Sensitivity)
-    {
-        senVerText.text = senVerSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityVer.ToString(), Sensitivity);
-    }
-    public void SetSensitivityGamepad(float Sensitivity)
-    {
-        senPadText.text = senPadSlider.value.ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityPad.ToString(), Sensitivity);
-    }
-    public void SetSensitivityZoom(float Sensitivity)
-    {
-        senZoomText.text = (senZoomSlider.value / 2).ToString("0.");
-        PlayerPrefs.SetFloat(OptionsValues.SensitivityZoom.ToString(), Sensitivity);
-    }
+    #endregion
 
     private void HighlightSelected(Button[] buttons)
     {
         foreach (Button btn in buttons)
         {
             ColorBlock colors = btn.colors;
-            colors.normalColor = normalColor;
+            colors.normalColor = colorNormal;
             btn.colors = colors;
         }
 
@@ -372,55 +214,5 @@ public class Menu : MonoBehaviour
         Color c = startText.color;
         c.a = 1f;
         startText.color = c;
-    }
-    //public void SelectBack(GameObject backButton)
-    //{
-    //    EventSystem.current.SetSelectedGameObject(backButton);
-    //}
-
-    private void ResolutionStart()
-    {
-        resolutions = Screen.resolutions;
-        filteredResolutions = new List<Resolution>();
-        resolutionDropdown.ClearOptions();
-        currentRefreshRate = (float)Screen.currentResolution.refreshRateRatio.value;
-
-        for (int i = 0; i < resolutions.Length; i++)
-        {
-            if ((float)resolutions[i].refreshRateRatio.value == currentRefreshRate)
-            {
-                filteredResolutions.Add(resolutions[i]);
-            }
-        }
-
-        filteredResolutions.Sort((a, b) => {
-            if (a.width != b.width)
-                return b.width.CompareTo(a.width);
-            else
-                return b.height.CompareTo(a.height);
-        });
-
-        List<string> options = new List<string>();
-
-        for (int i = 0; i < filteredResolutions.Count; i++)
-        {
-            string resolutionOption = filteredResolutions[i].width + "x" + filteredResolutions[i].height;
-            // + " " + filteredResolutions[i].refreshRateRatio.value.ToString("0.##") + " Hz";
-
-            options.Add(resolutionOption);
-
-            if (filteredResolutions[i].width == Screen.width && filteredResolutions[i].height == Screen.height &&
-                (float)filteredResolutions[i].refreshRateRatio.value == currentRefreshRate)
-            {
-                currentResolutionIndex = i;
-            }
-        }
-
-        resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = currentResolutionIndex = PlayerPrefs.GetInt(OptionsValues.Resolution.ToString(), 0);
-        resolutionDropdown.RefreshShownValue();
-
-        Resolution resolution = filteredResolutions[currentResolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, (FullScreenMode)PlayerPrefs.GetInt(OptionsValues.ScreenMode.ToString(), 1));
     }
 }

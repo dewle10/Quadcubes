@@ -1,31 +1,34 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class Falling : MonoBehaviour
 {
-    private bool falling = true;
-    private bool aboveSolid;
-    private float rayDistance = 1.1f;
     public float fallingSpeed = 1f;
-    private float fallingTimerTime = 5.0f;
-    private float fallingTimercounter;
-    [SerializeField] private int fallenBlocksPoints; 
-
-    public GameObject[] cubes;
-    private LayerMask layerMask;
-
-    [SerializeField] private ShapeDispenser shapeDispenser;
-    [SerializeField] private LinePoints linePoints;
-
-    private Vector3[] indicatorPos;
+    [Space(10)]
     [SerializeField] private GameObject ghostIndicator;
+    [SerializeField] private GameObject lights;
+    public GameObject[] cubes;
+
+    //Falling
+    private bool falling = true;
+    private readonly float fallingTimerTime = 5.0f;
+    private float fallingTimerCounter;
+    //GroundCheck
+    private bool isOnSolid;
+    private readonly float rayDistance = 1.1f;
+    //Ghost
+    private Vector3[] indicatorPos;
     private GameObject[] ghostIndicators;
 
-    [SerializeField] private GameObject lights;
+    private int fallenBlocksPoints; 
 
+    private LayerMask layerMask;
+    private ShapeDispenser shapeDispenser;
     private Transform gameArena;
 
-    public bool _Debug_IsLine;
+    [Space(10)]
+    public bool _Debug_IsLine; //For pre-placed lines
 
     private void Awake()
     {
@@ -34,11 +37,10 @@ public class Falling : MonoBehaviour
     private void Start()
     {
         shapeDispenser = FindFirstObjectByType<ShapeDispenser>();
-        linePoints = FindFirstObjectByType<LinePoints>();
         gameArena = FindFirstObjectByType<SceneShake>().transform;
         if (!_Debug_IsLine)
             GhostIndicatorArrays();
-        fallingSpeed = linePoints.GetFallingSpeed();
+        fallingSpeed = ScoreManager.GetFallingSpeed();
         if (_Debug_IsLine)
         {
             MakeSolid();
@@ -49,7 +51,6 @@ public class Falling : MonoBehaviour
         if (falling)
         {
             GroundCheck();
-
         }
     }
     void Update()
@@ -62,19 +63,22 @@ public class Falling : MonoBehaviour
         else
             DestroyIfEmpty();
     }
+
+
+    #region FALLING
     private void Fall()
     {
-        fallingTimercounter += Time.deltaTime;
+        fallingTimerCounter += Time.deltaTime;
 
-        if (fallingTimercounter >= fallingTimerTime / fallingSpeed)
+        if (fallingTimerCounter >= fallingTimerTime / fallingSpeed)
         {
-            if (aboveSolid)
+            if (isOnSolid)
             {
                 MakeSolid();
             }
             else
             {
-                fallingTimercounter = 0;
+                fallingTimerCounter = 0;
                 transform.position += Vector3.down;
             }
         }
@@ -88,17 +92,17 @@ public class Falling : MonoBehaviour
 
         SceneShake.Shake();
     }
-    private void GroundCheck()
+    #endregion
+
+    #region GROUND & SOLID
+    private void GroundCheck() //Checks if shape is on ground or solid shape 
     {
+        isOnSolid = false;
         foreach (GameObject obj in cubes)
         {
-            aboveSolid = false;
-            RaycastHit hit;
-            if (Physics.Raycast(obj.transform.position, Vector3.down, out hit, rayDistance, layerMask))
+            if (Physics.Raycast(obj.transform.position, Vector3.down, out RaycastHit hit, rayDistance, layerMask))
             {
-                //Debug.DrawRay(obj.transform.position, Vector3.down * hit.distance, Color.yellow);
-                //Debug.Log("Did Hit");
-                aboveSolid = true;
+                isOnSolid = true;
                 break;
             }
         }
@@ -113,19 +117,18 @@ public class Falling : MonoBehaviour
             cube.layer = 6; //solid
             GridManager.AddToGrid(cube.transform);
             RowColors.ChangeColor(cube);
-            cube.GetComponentInChildren<ChangeColor>().PlayPlaceParticle();
+            cube.GetComponentInChildren<VisualEffects>().PlayPlaceParticle();
         }
-        fallingTimercounter = 0;
+        fallingTimerCounter = 0;
         DestroyGhostCubes();
-        linePoints.GetFallingSpeed();
         shapeDispenser.ResetHold();
         transform.SetParent(gameArena, true);
 
         if (!_Debug_IsLine)
         {
             lights.SetActive(false);
-            linePoints.PointsCheck(fallingSpeed);
-            linePoints.AddDropPoints(fallenBlocksPoints);
+            ScoreManager.PointsCheck(fallingSpeed);
+            ScoreManager.AddDropPoints(fallenBlocksPoints);
             shapeDispenser.SpawnShape(false);
         }
     }
@@ -137,7 +140,6 @@ public class Falling : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(obj.transform.position, Vector3.down, out hit, 50, layerMask))
             {
-                Debug.DrawRay(obj.transform.position, Vector3.down * hit.distance, Color.blue);
                 float distance = hit.distance - .05f; //cubes are slightly smaller than 1f
                 if (rayDistance >= distance)
                 {
@@ -155,6 +157,9 @@ public class Falling : MonoBehaviour
         newPos.z = Mathf.Round(newPos.z / gridUnit) * gridUnit;
         obj.position = newPos;
     }
+    #endregion
+
+    #region GHOST INDICATOR
     private void GhostIndicator()
     {
         for (int i = 0; i < cubes.Length; i++)
@@ -166,7 +171,6 @@ public class Falling : MonoBehaviour
                 indicatorPos[i] = newIndicatorPos;
                 ghostIndicators[i].transform.position = indicatorPos[i];
                 SnapToGrid(0.5f, ghostIndicators[i].transform);
-                //Debug.Log("ghost");
             }
         }
     }
@@ -195,6 +199,9 @@ public class Falling : MonoBehaviour
             }
         }
     }
+    #endregion
+
+    #region UTILITY
     public void DestroyShape()
     {
         DestroyGhostCubes();
@@ -202,11 +209,12 @@ public class Falling : MonoBehaviour
     }
     public void DestroyIfEmpty()
     {
-        if (transform.childCount <= 1)
+        if (transform.childCount == 0)
             Destroy(gameObject);
     }
     public void ResetFallingTimer()
     {
-        fallingTimercounter = 0;
+        fallingTimerCounter = 0;
     }
+    #endregion
 }

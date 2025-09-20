@@ -1,12 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
 
 public class MoveShape : MonoBehaviour
 {
     //INPUT
-    public InputActionAsset inputAction;
-
     private InputAction moveAction;
     private InputAction moveDownAction;
     private InputAction rotateActionX;
@@ -26,7 +23,6 @@ public class MoveShape : MonoBehaviour
 
     //CONTROL
     private Vector3 directionVector;
-    //private Vector2 inputVector;
     private float rotateXTurn;
     private float rotateYTurn;
     private float rotateZTurn;
@@ -35,7 +31,6 @@ public class MoveShape : MonoBehaviour
     private bool wallKick = false;
     private GameObject currentShape;
     private CameraTracker cameraTracker;
-    private LinePoints linePoints;
     [SerializeField] private int sector;
 
     //Detection
@@ -44,11 +39,6 @@ public class MoveShape : MonoBehaviour
     private GhostDetection[] ghostDetections;
     [SerializeField] private GameObject indicatorCube;
     private WallKicks[] walls;
-
-    ////Sound
-    //[SerializeField] private AudioSource audioMove;
-    //[SerializeField] private AudioSource audioRotate;
-    //[SerializeField] private AudioSource audioDrop;
 
     private void Awake()
     {
@@ -60,16 +50,34 @@ public class MoveShape : MonoBehaviour
         DropAction = InputSystem.actions.FindAction("Drop");
         walls = FindObjectsByType<WallKicks>(FindObjectsSortMode.None);
         cameraTracker = FindFirstObjectByType<CameraTracker>();
-        linePoints = FindFirstObjectByType<LinePoints>();
+    }
+    private void OnEnable()
+    {
+        moveAction.Enable();
+        moveDownAction.Enable();
+        rotateActionX.Enable();
+        rotateActionY.Enable();
+        rotateActionZ.Enable();
+        DropAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        moveAction.Disable();
+        moveDownAction.Disable();
+        rotateActionX.Disable();
+        rotateActionY.Disable();
+        rotateActionZ.Disable();
+        DropAction.Disable();
     }
     void Update()
     {
-        if (!GridManager.gameOver && !Pause.isPaused)
+        if (!GridManager.gameOver && !Pause.IsPaused)
             CheckInput();
     }
     private void FixedUpdate()
     {
-        if (!GridManager.gameOver && !Pause.isPaused)
+        if (!GridManager.gameOver && !Pause.IsPaused)
         {
             Move();
             Rotate();
@@ -151,11 +159,10 @@ public class MoveShape : MonoBehaviour
         for (int i = 0; i < currentGhost.childCount; i++)
         {
             bool hit = ghostDetections[i].GetghostHitRotate();
-            if (ghostDetections[i].GetWallHit())
+            if (ghostDetections[i].WallHit)
             {
                 wallKick = true;
-                wallKickDirection += ghostDetections[i].GetKickDirection();
-                //Debug.Log("Wall Hit");
+                wallKickDirection += ghostDetections[i].KickDirection;
             }
             else if (hit)
             {
@@ -167,7 +174,6 @@ public class MoveShape : MonoBehaviour
         }
         if (wallKick)
         {
-            //Debug.Log(wallKickDirection);
             directionVector = wallKickDirection;
             TryMove();
         }
@@ -215,19 +221,16 @@ public class MoveShape : MonoBehaviour
                     if (!ghostDetections[i].GetghostHitMove(new Vector3(directionVector.x, 0, 0)))
                     {
                         canMoveX = true;
-                        //Debug.Log($"canMoveX{i}");
                         continue;
                     }
                     if (!ghostDetections[i].GetghostHitMove(new Vector3(0, 0, directionVector.z)))
                     {
                         canMoveZ = true;
-                        //Debug.Log($"canMoveZ{i}");
                         continue;
                     }
                 }
                 canMoveX = false;
                 canMoveZ = false;
-                //Debug.Log("brake");
                 break;
             }
         }
@@ -244,8 +247,7 @@ public class MoveShape : MonoBehaviour
 
             if (directionVector.y < 0) // if down
             {
-                linePoints.AddDropPoints(1);
-                //currentShape.GetComponent<Falling>().ResetFallingTimer();
+                ScoreManager.AddDropPoints(1);
             }
         }
     }
@@ -256,19 +258,18 @@ public class MoveShape : MonoBehaviour
     }
     private Vector3 RemapBySector(Vector3 inputVec, int sector)
     {
-        switch (sector)
+        return sector switch
         {
-            case 0: //front
-                return new Vector3(-inputVec.x, inputVec.y, -inputVec.z);
-            case 1: //right
-                return new Vector3(-inputVec.z, inputVec.y, inputVec.x);
-            case 2: //back
-                return inputVec;
-            case 3: //left
-                return new Vector3(inputVec.z, inputVec.y, -inputVec.x);
-            default:
-                return Vector3.zero;
-        }
+            //front
+            0 => new Vector3(-inputVec.x, inputVec.y, -inputVec.z),
+            //right
+            1 => new Vector3(-inputVec.z, inputVec.y, inputVec.x),
+            //back
+            2 => inputVec,
+            //left
+            3 => new Vector3(inputVec.z, inputVec.y, -inputVec.x),
+            _ => Vector3.zero,
+        };
     }
     private void GetGhost()
     {
@@ -290,17 +291,6 @@ public class MoveShape : MonoBehaviour
             GameObject failedRotationIndicator = Instantiate(indicatorCube, ghostcubes[i].transform.position, ghostcubes[i].transform.rotation);
             AutoDestroy IndicatorTime = failedRotationIndicator.GetComponent<AutoDestroy>();
             IndicatorTime.autoDestroytimerTime = 0.2f;
-        }
-    }
-    private void GhostCheckRotate()
-    {
-        for (int i = 0; i < currentGhost.childCount; i++)
-        {
-            if (ghostDetections[i].GetghostHitMove(directionVector))
-            {
-                canMove = false;
-                break;
-            }
         }
     }
     private void ResetWalls()

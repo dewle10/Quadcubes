@@ -10,25 +10,23 @@ using UnityEngine.SceneManagement;
 public class Pause : MonoBehaviour
 {
     [SerializeField] private MoveCamera moveCamera;
-    public static bool isPaused;
-    public static bool isSettings;
-    public static bool isControls;
+    public static bool IsPaused { private set; get; }
+    public static bool IsSettings { private set; get; }
+    public static bool IsControls { private set; get; }
     private InputAction pauseAction;
     private InputAction backAction;
+    private InputAction dropAction;
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject settingsMenu;
     [SerializeField] private GameObject controlsMenu;
     [SerializeField] private GameObject firstSelectedPause;
     [SerializeField] private GameObject firstSelectedSettings;
-    private ColorAdjustments colorAdjustments;
 
     private void Start()
     {
         pauseAction = InputSystem.actions.FindAction("Pause");
         backAction = InputSystem.actions.FindAction("Back");
-        Volume volume = FindFirstObjectByType<Volume>();
-        volume.profile.TryGet(out colorAdjustments);
-        colorAdjustments.postExposure.Override(PlayerPrefs.GetFloat(OptionsValues.Gamma.ToString(), 0));
+        dropAction = InputSystem.actions.FindAction("Drop");
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -37,9 +35,9 @@ public class Pause : MonoBehaviour
     {
         if (pauseAction.WasPressedThisFrame())
         {
-            if (isPaused)
+            if (IsPaused)
             {
-                if (!isSettings) GameResume();
+                if (!IsSettings) GameResume();
             }
             else
             {
@@ -49,8 +47,8 @@ public class Pause : MonoBehaviour
         }
         if (backAction.WasPressedThisFrame())
         {
-            if (!isSettings) GameResume();
-            else if (!isControls) BackButton();
+            if (!IsSettings) GameResume();
+            else if (!IsControls) BackButton();
             else BackButtonControls();
         }
     }
@@ -64,11 +62,11 @@ public class Pause : MonoBehaviour
 
     private IEnumerator ResumeWhenReleased()
     {
-        while (Input.GetButton("Submit"))
+        while (dropAction.IsPressed())
             yield return null;
         pauseMenu.SetActive(false);
         Time.timeScale = 1f;
-        isPaused = false;
+        IsPaused = false;
     }
     private void GamePause()
     {
@@ -79,12 +77,12 @@ public class Pause : MonoBehaviour
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             Time.timeScale = 0f;
-            isPaused = true;
+            IsPaused = true;
         }
     }
     public void Settings()
     {
-        isSettings = true;
+        IsSettings = true;
         pauseMenu.SetActive(false);
         settingsMenu.SetActive(true);
         EventSystem.current.SetSelectedGameObject(firstSelectedSettings);
@@ -92,7 +90,7 @@ public class Pause : MonoBehaviour
     }
     public void Controls()
     {
-        isControls = true;
+        IsControls = true;
         settingsMenu.SetActive(false);
         controlsMenu.SetActive(true);
         SoundManager.PlaySound(SoundType.ClickButton);
@@ -101,7 +99,7 @@ public class Pause : MonoBehaviour
     public void LoadMenu()
     {
         Time.timeScale = 1f;
-        isPaused = false;
+        IsPaused = false;
         SoundManager.PlaySound(SoundType.ClickButton); 
         LoadingScreen.sceneToLoad = "Menu";
         SceneManager.LoadScene("Loading");
@@ -109,14 +107,14 @@ public class Pause : MonoBehaviour
     public void LoadMenuDemo()
     {
         Time.timeScale = 1f;
-        isPaused = false;
+        IsPaused = false;
         SoundManager.PlaySound(SoundType.ClickButton);
         LoadingScreen.sceneToLoad = "MenuDemo";
         SceneManager.LoadScene("Loading");
     }
     public void BackButton()
     {
-        isSettings = false;
+        IsSettings = false;
         pauseMenu.SetActive(true);
         settingsMenu.SetActive(false);
         moveCamera.SetSettingsValues();
@@ -125,7 +123,7 @@ public class Pause : MonoBehaviour
     }
     public void BackButtonControls()
     {
-        isControls = false;
+        IsControls = false;
         settingsMenu.SetActive(true);
         controlsMenu.SetActive(false);
         EventSystem.current.SetSelectedGameObject(firstSelectedSettings);

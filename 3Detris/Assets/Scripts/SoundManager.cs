@@ -1,7 +1,5 @@
 using System;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.VFX;
 
 public enum SoundType
 {
@@ -31,11 +29,18 @@ public class SoundManager : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            instance = this;
+        }
     }
     private void Start()
     {
-        SoundManager.PlayMusic();
+        PlayMusic();
     }
 
     public static void PlaySound(SoundType sound, float volume = 1f)

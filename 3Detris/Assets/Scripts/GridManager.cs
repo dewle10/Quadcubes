@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.VFX;
 
 public class GridManager : MonoBehaviour
 {
@@ -11,11 +12,11 @@ public class GridManager : MonoBehaviour
 
     public static int gameWidth = 6;
     public static int gameHeight = 12;
+    private const int BufferHeight = 5;
 
-    public static Transform[,,] grid = new Transform[gameWidth, gameHeight + 5, gameWidth];
+    private static Transform[,,] grid = new Transform[gameWidth, gameHeight + BufferHeight, gameWidth];
+    private static List<Transform> placedCubes = new();
     public static bool gameOver = false;
-
-    static private Leaderboard leaderboard;
 
     private GameObject walls;
     private GameObject outOfBounds;
@@ -32,14 +33,20 @@ public class GridManager : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            instance = this;
+        }
         if (isDemo) gameWidth = 5;
     }
 
     private void Start()
     {
         gameOver = false;
-        leaderboard = gameObject.GetComponent<Leaderboard>();
 
         walls = GameObject.Find("Walls");
         outOfBounds = GameObject.Find("OutOfBounds col"); 
@@ -56,11 +63,11 @@ public class GridManager : MonoBehaviour
         int y = (int)pos.y;
         int z = (int)pos.z;
         grid[x, y, z] = cubeTran;
-        //Debug.Log($"{cubeTran.gameObject} + {x} + {y} + {z}");
+        placedCubes.Add(cubeTran);
     }
     public static void ShiftDownCubesAbove(int floorNum)
     {
-        for (int y = floorNum + 1; y < gameHeight + 5; y++)
+        for (int y = floorNum + 1; y < gameHeight + BufferHeight; y++)
         {
             for (int x = 0; x < gameWidth; x++)
             {
@@ -75,11 +82,9 @@ public class GridManager : MonoBehaviour
                         cube.position += Vector3.down;
                         RowColors.ChangeColor(cube.gameObject);
                     }
-
                 }
             }
         }
-        //Debug.Log(floorNum);
     }
     public static void LossCheck()
     {
@@ -87,7 +92,7 @@ public class GridManager : MonoBehaviour
         {
             for (int z = 0; z < gameWidth; z++)
             {
-                for (int y = gameHeight + 4; y >= gameHeight; y--) // +4 because grid height is higher than game height
+                for (int y = gameHeight + BufferHeight - 1; y >= gameHeight; y--)
                 {
                     if (grid[x, y, z])
                     {
@@ -108,15 +113,14 @@ public class GridManager : MonoBehaviour
                 Transform cube = grid[x, floorNum, z];
                 if (cube != null)
                 {
-                    cube.GetComponentInChildren<ChangeColor>().PlayLCParticle();
+                    cube.GetComponentInChildren<VisualEffects>().PlayLCParticle();
 
                     Destroy(cube.gameObject);
                     grid[x, floorNum, z] = null;
+                    placedCubes.Remove(cube);
                 }
                 else
-                {
-                    Debug.Log("Error: No cube to Destroy");
-                }
+                    Debug.LogWarning("Error: No cube to Destroy");
             }
         }
     }
@@ -130,7 +134,6 @@ public class GridManager : MonoBehaviour
                     return false;
             }
         }
-        LinePoints.clearedLinesDrop++;
         SoundManager.PlaySound(SoundType.ClearLine, 1.2f);
         return true;
     }
@@ -138,25 +141,22 @@ public class GridManager : MonoBehaviour
     {
         SoundManager.StopMusic();
         SoundManager.PlaySound(SoundType.GameOver);
-        leaderboard.AddScore("YOU", LinePoints.Score, (BoardSize)gameWidth, LinePoints.gameMode);
+        ScoreLeaderboard.AddScore("YOU", ScoreManager.Points, (BoardSize)gameWidth, ScoreManager.gameMode);
 
-        yield return new WaitForSeconds(0.2f);
-        walls.SetActive(false); 
-        yield return new WaitForSeconds(0.2f);
-        walls.SetActive(true); 
-        yield return new WaitForSeconds(0.2f);
-        walls.SetActive(false); 
-        yield return new WaitForSeconds(0.2f);
-        walls.SetActive(true); 
-        yield return new WaitForSeconds(0.2f);
-        walls.SetActive(false);
+        //Walls blinking
+        for (int i = 0; i < 5; i++)
+        {
+            walls.SetActive(i % 2 != 0);
+            yield return new WaitForSeconds(0.2f);
+        }
 
+        //Change all to red color
         float waitTime = 0.05f;
         float changeAfter = 3f;
         float newWaitTime = 0.03f;
         float startTime = Time.time;
 
-        for (int y = 0; y < gameHeight + 4; y++)
+        for (int y = 0; y < gameHeight + BufferHeight; y++)
         {
             for (int x = 0; x < gameWidth; x++)
             {
@@ -176,55 +176,31 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
-        outOfBounds.SetActive(false);
-
+        //Explosion
         yield return new WaitForSeconds(0.5f);
-        for (int x = 0; x < gameWidth; x++)
-        {
-            for (int y = 0; y < gameHeight + 4; y++)
-            {
-                for (int z = 0; z < gameWidth; z++)
-                {
-                    if (grid[x, y, z])
-                    {
-                        grid[x, y, z].gameObject.AddComponent<Rigidbody>();
-                    }
-                }
-            }
-        }
+        outOfBounds.SetActive(false);
         Explode();
-        //StartCoroutine(DebugResetGame());
-        //Debug.Log("loss");
-        //SceneManager.LoadScene(0);
-
         yield return new WaitForSeconds(3f);
 
+        ShowGameOverUI();
+    }
+
+    private void ShowGameOverUI()
+    {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         gameOverMenu.SetActive(true);
-        finalScoreText.text = LinePoints.Score.ToString();
+        finalScoreText.text = ScoreManager.Points.ToString();
     }
     private void Explode()
     {
-        Collider[] colliders = Physics.OverlapSphere(explosionPosition, explosionRadius);
-
-        SoundManager.PlaySound(SoundType.Explode);
-        foreach (Collider hit in colliders)
+        foreach(Transform cube in placedCubes)
         {
-            Rigidbody rb = hit.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier, ForceMode.Impulse);
-            }
+            Rigidbody rb = cube.gameObject.AddComponent<Rigidbody>();
+            rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier, ForceMode.Impulse);
         }
+        SoundManager.PlaySound(SoundType.Explode);
     }
-    private IEnumerator DebugResetGame()
-    {
-        yield return new WaitForSeconds(5f);
-        LoadingScreen.sceneToLoad = "Game6x6";
-        SceneManager.LoadScene("Loading");
-    }
-
     public void Restart()
     {
         SoundManager.PlaySound(SoundType.ClickButton);
