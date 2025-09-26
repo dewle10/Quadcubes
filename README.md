@@ -11,7 +11,7 @@ Features:
   * Minimalist Design – Clean visuals keep the focus on puzzle‑solving.
   * Progress Tracking – personal bests records to chase higher scores.
 
-Play the Demo on: https://dewle.itch.io/quadcubes.
+Play the Demo on: [dewle.itch.io/quadcubes](https://dewle.itch.io/quadcubes).
 
 Made in Unity 6000.1.71f.
 
