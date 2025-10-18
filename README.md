@@ -12,6 +12,7 @@ Features:
   * Progress Tracking – personal bests records to chase higher scores.
 
 Play the Demo on: [dewle.itch.io/quadcubes](https://dewle.itch.io/quadcubes).
+Gameplay: [youtu.be/GBKYreJCX-k](https://youtu.be/GBKYreJCX-k).
 
 Made in Unity 6000.1.71f.
 
