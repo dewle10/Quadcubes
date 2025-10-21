@@ -18,3 +18,6 @@ Made in Unity 6000.1.71f.
 
 ![Quadcubes Sizes](3Detris/Assets/Recordings/Quadcubes_Description_Screenshots.png)
 ![Quadcubes Gameplay](3Detris/Assets/Recordings/Quadcubes_Gameplay.png)
+![Quadcubes Settings](3Detris/Assets/Recordings/ss_Settings.png)
+![Quadcubes Controls](3Detris/Assets/Recordings/ss_Controls.png)
+![Quadcubes Leaderboards](3Detris/Assets/Recordings/ss_Leaderboards.png)
