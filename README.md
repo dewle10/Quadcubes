@@ -10,9 +10,12 @@ Features:
   * Variable Playfields – Select 4×4, 5×5 or 6×6 grids to scale complexity.
   * Minimalist Design – Clean visuals keep the focus on puzzle‑solving.
   * Progress Tracking – personal bests records to chase higher scores.
+    
 
 Play the Demo on: [dewle.itch.io/quadcubes](https://dewle.itch.io/quadcubes).
 Gameplay: [youtu.be/GBKYreJCX-k](https://youtu.be/GBKYreJCX-k).
+
+Available on Steam: [store.steampowered.com/app/3898080/Quadcubes](https://store.steampowered.com/app/3898080/Quadcubes/)
 
 Made in Unity 6000.1.71f.
 
