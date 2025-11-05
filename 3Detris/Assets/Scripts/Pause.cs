@@ -27,8 +27,10 @@ public class Pause : MonoBehaviour
         pauseAction = InputSystem.actions.FindAction("Pause");
         backAction = InputSystem.actions.FindAction("Back");
         dropAction = InputSystem.actions.FindAction("Drop");
+#if !UNITY_ANDROID
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+#endif
     }
 
     private void Update()
