@@ -70,7 +70,7 @@ public class Pause : MonoBehaviour
         Time.timeScale = 1f;
         IsPaused = false;
     }
-    private void GamePause()
+    public void GamePause()
     {
         if (!GridManager.gameOver)
         {

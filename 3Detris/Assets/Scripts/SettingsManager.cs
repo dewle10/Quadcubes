@@ -68,7 +68,9 @@ public class SettingsManager : MonoBehaviour
 
     private void Start()
     {
+#if UNITY_STANDALONE
         ResolutionStart(); //default: hightest Resolution
+#endif
 
         soundsSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.VolumeSounds), 1);
         musicSlider.value = PlayerPrefs.GetFloat(nameof(OptionsValues.VolumeMusic), 1);

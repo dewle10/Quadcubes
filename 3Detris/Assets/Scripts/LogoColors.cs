@@ -7,11 +7,13 @@ public class LogoColors : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_STANDALONE
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ChangeColors();
             SoundManager.PlaySound(SoundType.Rotate);
         }
+#endif
     }
     private void ChangeColors()
     {

@@ -45,7 +45,10 @@ public class Menu : MonoBehaviour
         Game4x4 = 4,
         Game5x5 = 5,
         Game6x6 = 6,
-        Game5x5Demo = 7
+        Game5x5Demo = 7,
+        Game4x4And = 8,
+        Game5x5And = 9,
+        Game6x6And = 10,
     }
     private GameSize gameSize;
     private void Awake()
@@ -56,10 +59,12 @@ public class Menu : MonoBehaviour
     }
     private void Start()
     {
+#if UNITY_STANDALONE
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         EventSystem.current.SetSelectedGameObject(firstSelected);
         settingsManager.SetResolution();
+#endif
     }
     private void OnEnable()
     {

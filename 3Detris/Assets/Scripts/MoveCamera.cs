@@ -1,6 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class MoveCamera : MonoBehaviour
 {
@@ -10,6 +13,8 @@ public class MoveCamera : MonoBehaviour
     [Header("Speeds")]
     [SerializeField] private float horizontalSpeed;
     [SerializeField] private float verticalSpeed;
+    [SerializeField] private float horizontalSpeedAnd;
+    [SerializeField] private float verticalSpeedAnd;
     [SerializeField] private float zoomSpeed;
     [SerializeField] private float padLookSpeed;
     [Header("Limits")]
@@ -74,6 +79,7 @@ public class MoveCamera : MonoBehaviour
         lookVerAction.Enable();
         zoomInOutAction.Enable();
         playerInput.onControlsChanged += OnControlsChanged;
+        EnhancedTouchSupport.Enable();
     }
     private void OnDisable()
     {
@@ -83,6 +89,7 @@ public class MoveCamera : MonoBehaviour
         lookVerAction.Disable();
         zoomInOutAction.Disable();
         playerInput.onControlsChanged -= OnControlsChanged;
+        EnhancedTouchSupport.Disable();
     }
     private void Update()
     {
@@ -96,6 +103,21 @@ public class MoveCamera : MonoBehaviour
             );
         }
         //Rotation target
+        foreach (var touch in Touch.activeTouches)
+        {
+            bool rotate = true;
+            if (touch.screenPosition.y < Screen.height / 5)
+            {
+                rotate = false;
+            }
+            if (!isStartPause && rotate)
+            {
+                Vector2 delta = touch.delta;
+                targetAngleY += delta.x * horizontalSpeedAnd * Time.deltaTime * invertXValue;
+                targetAngleX = Mathf.Clamp(targetAngleX + delta.y * verticalSpeedAnd * Time.deltaTime * invertYValue, minAngleX, maxAngleX);
+            }
+        }
+#if UNITY_STANDALONE
         if (!isStartPause)
         {
             Vector2 delta = lookAction.ReadValue<Vector2>();
@@ -106,6 +128,7 @@ public class MoveCamera : MonoBehaviour
             targetAngleY += delta.x * horizontalSpeed * Time.deltaTime * invertXValue;
             targetAngleX = Mathf.Clamp(targetAngleX + delta.y * verticalSpeed * Time.deltaTime * invertYValue, minAngleX, maxAngleX);
         }
+#endif
         //Rotation On Buttons
         float lookLRDir = lookHorAction.ReadValue<float>();
         if (lookHorAction.triggered)

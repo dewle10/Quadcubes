@@ -42,6 +42,11 @@ public class GridManager : MonoBehaviour
             instance = this;
         }
         if (isDemo) gameWidth = 5;
+#if UNITY_ANDROID
+        if (gameWidth == 8) gameWidth = 4;
+        if (gameWidth == 9) gameWidth = 5;
+        if (gameWidth == 10) gameWidth = 6;
+#endif
     }
 
     private void Start()
